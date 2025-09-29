@@ -87,8 +87,8 @@ Si quieres colaborar:
 
 ## 👥 Equipo
 📌 **Autores**:  
-- Juan Antonio Jiménez Hornillo  
-- Miguel González Del Portillo  
+- [Juan Antonio Jiménez Hornillo](https://github.com/jjimho439)
+- [Miguel González Del Portillo](https://github.com/mgonpor)
 
 
 🏫 **Centro académico**: IES Los Alcores - Mairena del Alcor
