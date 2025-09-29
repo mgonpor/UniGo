@@ -24,9 +24,9 @@ Con UniGO puedes:
 ---
 
 ## 🛠️ Tecnologías utilizadas
-- **Frontend**: React Native / Flutter
-- **Backend**: Node.js con Express
-- **Base de datos**: PostgreSQL / MongoDB
+- **Frontend**: React Native
+- **Backend**: Spring Boot + API Rest
+- **Base de datos**: MariaDB
 - **APIs externas**: Google Maps, Stripe/PayPal
 - **Arquitectura**: Cliente-Servidor con servicios escalables en la nube
 
@@ -48,20 +48,28 @@ Con UniGO puedes:
 
 ---
 
-## 🚀 Instalación y ejecución (para desarrolladores)
-```bash
+🚀 Instalación y ejecución (para desarrolladores)
+🔹 Backend (Spring Boot)
 # Clonar el repositorio
-git clone https://github.com/mgonpor/unigo.git
+git clone https://github.com/tuusuario/unigo-backend.git
+
+# Importar en tu IDE favorito (IntelliJ, Eclipse, VSCode)
+# Configurar la base de datos en application.properties
+# Ejecutar el proyecto
+mvn spring-boot:run
+
+🔹 Frontend (React)
+# Clonar el repositorio
+git clone https://github.com/tuusuario/unigo-frontend.git
 
 # Entrar al proyecto
-cd unigo
+cd unigo-frontend
 
 # Instalar dependencias
 npm install
 
 # Ejecutar en entorno de desarrollo
 npm start
-```
 
 ---
 
