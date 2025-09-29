@@ -96,8 +96,10 @@ Si quieres colaborar:
 📅 **Curso académico**: 2025-2026
 
 
-Desarrollado por estudiantes para estudiantes 🎓
-Si quieres unirte al equipo de desarrollo, ¡escríbenos!
+
+Desarrollado por estudiantes para estudiantes 
+
+🎓Si quieres unirte al equipo de desarrollo, ¡escríbenos!
 
 ---
 
