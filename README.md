@@ -50,6 +50,7 @@ Con UniGO puedes:
 
 🚀 Instalación y ejecución (para desarrolladores)
 🔹 Backend (Spring Boot)
+```bash
 # Clonar el repositorio
 git clone https://github.com/tuusuario/unigo-backend.git
 
@@ -57,8 +58,10 @@ git clone https://github.com/tuusuario/unigo-backend.git
 # Configurar la base de datos en application.properties
 # Ejecutar el proyecto
 mvn spring-boot:run
+```
 
 🔹 Frontend (React)
+```bash
 # Clonar el repositorio
 git clone https://github.com/tuusuario/unigo-frontend.git
 
@@ -70,6 +73,7 @@ npm install
 
 # Ejecutar en entorno de desarrollo
 npm start
+```
 
 ---
 
