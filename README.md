@@ -86,6 +86,16 @@ Si quieres colaborar:
 ---
 
 ## 👥 Equipo
+📌 **Autores**:  
+- Juan Antonio Jiménez Hornillo  
+- Miguel González Del Portillo  
+
+
+🏫 **Centro académico**: IES Los Alcores - Mairena del Alcor
+
+📅 **Curso académico**: 2025-2026
+
+
 Desarrollado por estudiantes para estudiantes 🎓
 Si quieres unirte al equipo de desarrollo, ¡escríbenos!
 
@@ -98,13 +108,5 @@ Este proyecto está bajo la licencia MIT – consulta el archivo [LICENSE](LICEN
 
 ¡Con **UniGO**, ir a clase nunca fue tan fácil, barato y sostenible!
 
-📌 **Autores**:  
-- Juan Antonio Jiménez Hornillo  
-- Miguel González Del Portillo  
-
-
-🏫 **Centro académico**: IES Los Alcores - Mairena del Alcor
-
-📅 **Curso académico**: 2025-2026
 
 ---
