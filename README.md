@@ -99,7 +99,7 @@ Si quieres colaborar:
 
 Desarrollado por estudiantes para estudiantes 
 
-🎓Si quieres unirte al equipo de desarrollo, ¡escríbenos!
+🎓 Si quieres unirte al equipo de desarrollo, ¡escríbenos!
 
 ---
 
