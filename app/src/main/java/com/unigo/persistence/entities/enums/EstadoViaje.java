@@ -1,4 +1,7 @@
 package com.unigo.persistence.entities.enums;
 
-public class EstadoViaje {
+public enum EstadoViaje {
+
+    DISPONIBLE, COMPLETADO, CANCELADO
+
 }

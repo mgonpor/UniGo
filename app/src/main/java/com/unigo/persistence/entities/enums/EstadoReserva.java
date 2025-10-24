@@ -1,4 +1,7 @@
 package com.unigo.persistence.entities.enums;
 
-public class EstadoReserva {
+public enum EstadoReserva {
+
+    PENDIENTE, CONFIRMADA, CANCELADA
+
 }
