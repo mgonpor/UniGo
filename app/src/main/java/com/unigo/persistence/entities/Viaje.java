@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "viaje")
@@ -23,8 +24,11 @@ public class Viaje {
     @JoinColumn(name = "id_conductor", nullable = false)
     private Conductor conductor;
 
-    private double[] origen;
-    private double[] destino;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Double> origen;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<Double> destino;
 
     @Column(name = "fecha_salida")
     private LocalDate fechaSalida;
