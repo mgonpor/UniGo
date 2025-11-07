@@ -1,5 +1,6 @@
 package com.unigo.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigo.persistence.entities.enums.EstadoViaje;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,15 +21,16 @@ public class Viaje {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_conductor", nullable = false)
+    @Column(name = "id_conductor")
+    private int idConductor;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_conductor", referencedColumnName = "id", insertable = false, updatable = false)
     private Conductor conductor;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Double> origen;
+    private String origen;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<Double> destino;
+    private String destino;
 
     @Column(name = "fecha_salida")
     private LocalDate fechaSalida;
@@ -39,6 +41,16 @@ public class Viaje {
     @Column(name="precio_plaza")
     private double precioPlaza;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_reserva")
     private EstadoViaje estadoViaje;
+
+    @OneToMany(mappedBy = "viaje")
+    @JsonIgnore
+    private List<Reserva> reservas;
+
+    @OneToMany(mappedBy = "viaje")
+    @JsonIgnore
+    private List<Mensaje> mensajes;
 
 }

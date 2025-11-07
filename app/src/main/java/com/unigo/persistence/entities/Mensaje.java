@@ -18,16 +18,25 @@ public class Mensaje {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_remitente", nullable = false)
+    @Column(name = "id_remitente")
+    private int idRemitente;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_remitente", referencedColumnName = "id", insertable = false, updatable = false)
     private Usuario remitente;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_destinatario", nullable = false)
+    @Column(name = "id_destinatario")
+    private int idDestinatario;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_destinatario", referencedColumnName = "id", insertable = false, updatable = false)
     private Usuario destinatario;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_viaje", nullable = false)
+    @Column(name = "id_viaje")
+    private int idViaje;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_viaje", referencedColumnName = "id", insertable = false, updatable = false)
     private Viaje viaje;
 
     private String texto;

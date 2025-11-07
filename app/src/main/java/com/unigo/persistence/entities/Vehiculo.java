@@ -16,8 +16,11 @@ public class Vehiculo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_conductor", nullable = false)
+    @Column(name = "id_conductor")
+    private int idConductor;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_conductor", referencedColumnName = "id", insertable = false, updatable = false)
     private Conductor conductor;
 
     private String marca;

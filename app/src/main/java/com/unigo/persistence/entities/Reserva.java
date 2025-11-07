@@ -19,12 +19,15 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "id_viaje")
+    private int idViaje;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_viaje", nullable = false)
+    @JoinColumn(name = "id_viaje", referencedColumnName = "id", insertable = false, updatable = false)
     private Viaje viaje;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_pasajero", nullable = false)
+    @JoinColumn(name = "id_pasajero", referencedColumnName = "id", insertable = false, updatable = false)
     private Pasajero pasajero;
 
     @Column(name="fecha_reserva")
@@ -36,8 +39,9 @@ public class Reserva {
     @Column(name="valoracion_texto")
     private String valoracionTexto;
 
-    private boolean pagado;
+//    private boolean pagado;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="estado_reserva")
     private EstadoReserva estadoReserva;
 
