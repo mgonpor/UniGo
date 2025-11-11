@@ -21,6 +21,7 @@ public abstract class Usuario {
     @Column(name = "nombre_usuario", unique = true)
     private String nombreUsuario;
 
+    @Column(unique = true)
     private String email;
 
     @OneToMany(mappedBy = "remitente")
