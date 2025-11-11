@@ -1,5 +1,6 @@
 package com.unigo.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Vehiculo {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_conductor", referencedColumnName = "id", insertable = false, updatable = false)
+    @JsonIgnore
     private Conductor conductor;
 
     private String marca;

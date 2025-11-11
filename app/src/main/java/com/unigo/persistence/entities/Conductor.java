@@ -21,7 +21,6 @@ public class Conductor extends Usuario {
     private float reputacion;
 
     @OneToMany(mappedBy = "conductor")
-    @JsonIgnore
     private List<Vehiculo> vehiculos;
 
     @OneToMany(mappedBy = "conductor")

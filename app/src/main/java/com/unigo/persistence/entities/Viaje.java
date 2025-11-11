@@ -46,7 +46,6 @@ public class Viaje {
     private EstadoViaje estadoViaje;
 
     @OneToMany(mappedBy = "viaje")
-    @JsonIgnore
     private List<Reserva> reservas;
 
     @OneToMany(mappedBy = "viaje")

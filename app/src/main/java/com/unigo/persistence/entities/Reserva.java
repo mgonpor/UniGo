@@ -1,5 +1,6 @@
 package com.unigo.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unigo.persistence.entities.enums.EstadoReserva;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,7 +25,11 @@ public class Reserva {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_viaje", referencedColumnName = "id", insertable = false, updatable = false)
+    @JsonIgnore
     private Viaje viaje;
+
+    @Column(name = "id_pasajero")
+    private int idPasajero;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_pasajero", referencedColumnName = "id", insertable = false, updatable = false)
