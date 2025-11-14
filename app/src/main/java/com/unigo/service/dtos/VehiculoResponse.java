@@ -1,10 +1,17 @@
 package com.unigo.service.dtos;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Builder
-public record VehiculoResponse(int id,
-                               String marca,
-                               String modelo,
-                               String color) {
+@Getter
+@Setter
+@NoArgsConstructor
+public class VehiculoResponse {
+
+    private Integer id;
+    private String marca;
+    private String modelo;
+    private String color;
+
 }

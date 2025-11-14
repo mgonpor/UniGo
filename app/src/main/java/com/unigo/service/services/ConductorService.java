@@ -2,13 +2,16 @@ package com.unigo.service.services;
 
 import com.unigo.persistence.entities.Conductor;
 import com.unigo.persistence.repositories.ConductorRepository;
+import com.unigo.service.dtos.ConductorRequest;
 import com.unigo.service.dtos.ConductorResponse;
+import com.unigo.service.exceptions.ConductorException;
 import com.unigo.service.exceptions.ConductorNotFoundException;
 import com.unigo.service.mappers.ConductorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ConductorService {
@@ -19,41 +22,61 @@ public class ConductorService {
     public List<ConductorResponse> findAll(){
         return conductorRepository.findAll()
                 .stream()
-                .map(ConductorMapper.INSTANCE::mapConductorToDto)
-                .toList();
+                .map(ConductorMapper::mapConductorToDto)
+                .collect(Collectors.toList());
     }
 
-    public ConductorResponse findById(int id){ // TODO: Usar DTOs
+    public ConductorResponse findById(int id){
         if(!conductorRepository.existsById(id)){
             throw new ConductorNotFoundException("Conductor " + id + " no encontrado.");
         }
 
         Conductor conductor = conductorRepository.findById(id).get();
 
-        return ConductorMapper.INSTANCE.mapConductorToDto(conductor);
+        return ConductorMapper.mapConductorToDto(conductor);
     }
 
-    // TODO: AVERIGUAR COMO MAPEAR ConductorRequest DESDE ConductorMapper (mapDtoToConductor)
-    // ANTES DE VEHICULO
-    // ESTO PA ENTIDADES QUE NO DEVUELVAN LISTAS (Mapper INTERFACE también)
-//    public ConductorResponse create(ConductorRequest conductorRequest){
-//
-//        // Recoge Request y guarda Entity
-//        Conductor conductor = ConductorMapper.INSTANCE.mapDtoToConductor(conductorRequest);
-//        conductorRepository.save(conductor);
-//
-//        // Recoge Entity y devuelve
-//        return ConductorMapper.INSTANCE.mapConductorToDto(conductor);
-//
-//    }
+    // DESPUÉS SE CREARÁN USUARIOS COMO PASAJEROS
+    // Y SE CREARÁN LOS CONDUCTORES AL AÑADIR UN VEHÍCULO
+    public ConductorResponse create(ConductorRequest conductorRequest){
+
+        if(conductorRequest.getNombre()==null || conductorRequest.getNombre().isBlank()){
+            throw new ConductorException("Nombre del conductor no puede estar vacio.");
+        }
+        if(conductorRequest.getNombreUsuario()==null || conductorRequest.getNombreUsuario().isBlank()){
+            throw new ConductorException("Nombre de usuario del conductor no puede estar vacio.");
+        }
+        if (conductorRequest.getEmail()==null || conductorRequest.getEmail().isBlank()){
+            throw new ConductorException("Email del conductor no puede estar vacio.");
+        }
+        if(conductorRequest.getPassword()==null || conductorRequest.getPassword().isBlank()){
+            throw new ConductorException("Password de conductor no puede estar vacia.");
+        }
+
+        conductorRequest.setId(0);  // Nuevo id
+
+        Conductor conductor = ConductorMapper.mapDtoToConductor(conductorRequest);
+
+        conductor.setReputacion(0); // Le damos reputación 0 para empezar
+
+        conductorRepository.save(conductor);
+
+        // Recoge Entity y devuelve
+        return ConductorMapper.mapConductorToDto(conductor);
+
+    }
 
 
     // POSIBLES MÉTODOS
     public List<ConductorResponse> findByReputacionGreaterThanEqual(float reputacionMayorQue){
 
+        if(reputacionMayorQue > 5 || reputacionMayorQue < 0){
+            throw new ConductorException("La reputación se mide entre 1 y 5.");
+        }
+
         List<ConductorResponse> lista = conductorRepository.findByReputacionGreaterThanEqual(reputacionMayorQue)
                                         .stream()
-                                        .map(ConductorMapper.INSTANCE::mapConductorToDto)
+                                        .map(ConductorMapper::mapConductorToDto)
                                         .toList();
 
         if(lista.isEmpty()){

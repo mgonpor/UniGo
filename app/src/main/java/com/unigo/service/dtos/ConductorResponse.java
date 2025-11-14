@@ -1,13 +1,20 @@
 package com.unigo.service.dtos;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Builder
-public record ConductorResponse(int id,
-                                String nombre,
-                                String nombreUsuario,
-                                List<VehiculoResponse> vehiculos,
-                                float reputacion) {
+@Getter
+@Setter
+@NoArgsConstructor
+public class ConductorResponse {
+
+    private Integer id;
+    private String nombre;
+    private String nombreUsuario;
+    private List<VehiculoResponse> vehiculos;
+    private Float reputacion;
+
 }

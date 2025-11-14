@@ -7,12 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ConductorRequest {
+public class VehiculoRequest {
 
     private Integer id;
-    private String nombre;
-    private String nombreUsuario;
-    private String email;
-    private String password;
+    private Integer idConductor;
+    private String marca;
+    private String modelo;
+    private String color;
+    private String matricula;
 
 }

@@ -1,6 +1,8 @@
 package com.unigo.web.controllers;
 
+import com.unigo.service.dtos.ConductorRequest;
 import com.unigo.service.dtos.ConductorResponse;
+import com.unigo.service.exceptions.ConductorException;
 import com.unigo.service.services.ConductorService;
 import com.unigo.service.exceptions.ConductorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,14 @@ public class ConductorController {
         }
     }
 
-
+    @PostMapping
+    public ResponseEntity<?> create(ConductorRequest conductorRequest){
+        try{
+            return ResponseEntity.ok(conductorService.create(conductorRequest));
+        }catch (ConductorException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 
     // POSIBLES MÉTODOS (YA EN EL SERVICIO)
 
@@ -39,6 +48,8 @@ public class ConductorController {
     public ResponseEntity<?> findByReputacionGreaterThanEqual(@RequestParam float mayorQue){
         try{
             return ResponseEntity.ok(conductorService.findByReputacionGreaterThanEqual(mayorQue));
+        }catch (ConductorException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }catch (ConductorNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

@@ -39,9 +39,10 @@ public class Mensaje {
     @JoinColumn(name = "id_viaje", referencedColumnName = "id", insertable = false, updatable = false)
     private Viaje viaje;
 
+    @Column(nullable = false)
     private String texto;
 
-    @Column(name = "fecha_envio")
+    @Column(name = "fecha_envio",  nullable = false)
     private LocalDate fechaEnvio;
 
 }

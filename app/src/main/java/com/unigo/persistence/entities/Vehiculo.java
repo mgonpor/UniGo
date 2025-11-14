@@ -25,9 +25,12 @@ public class Vehiculo {
     @JsonIgnore
     private Conductor conductor;
 
+    @Column(nullable = false)
     private String marca;
+    @Column(nullable = false)
     private String modelo;
     private String color;
+    @Column(nullable = false)
     private String matricula;
 
 }

@@ -44,7 +44,8 @@ public class Reserva {
     @Column(name="valoracion_texto")
     private String valoracionTexto;
 
-//    private boolean pagado;
+    @Column(nullable = false)
+    private boolean pagado = false;
 
     @Enumerated(EnumType.STRING)
     @Column(name="estado_reserva")

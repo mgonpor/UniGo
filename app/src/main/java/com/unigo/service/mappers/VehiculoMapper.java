@@ -1,27 +1,32 @@
 package com.unigo.service.mappers;
 
 import com.unigo.persistence.entities.Vehiculo;
+import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        componentModel = "spring")
-public abstract class VehiculoMapper {
+public class VehiculoMapper {
 
-    public static final VehiculoMapper INSTANCE = Mappers.getMapper(VehiculoMapper.class);
+    public static VehiculoResponse mapVehiculoToDto(Vehiculo vehiculo) {
+        VehiculoResponse dto = new VehiculoResponse();
+        dto.setId(vehiculo.getId());
+        dto.setMarca(vehiculo.getMarca());
+        dto.setModelo(vehiculo.getModelo());
+        dto.setColor(vehiculo.getColor());
 
-    public VehiculoResponse mapVehiculoToDto(Vehiculo vehiculo) {
-
-        return VehiculoResponse.builder()
-                .id(vehiculo.getId())
-                .marca(vehiculo.getMarca())
-                .modelo(vehiculo.getModelo())
-                .color(vehiculo.getColor())
-                .build();
+        return dto;
     }
 
-    //TODO: mapDtoToVehiculo
+
+    public static Vehiculo mapDtoToVehiculo(VehiculoRequest dto) {
+        Vehiculo vehiculo = new Vehiculo();
+        vehiculo.setId(dto.getId());
+        vehiculo.setIdConductor(dto.getIdConductor());
+        vehiculo.setMarca(dto.getMarca());
+        vehiculo.setModelo(dto.getModelo());
+        vehiculo.setColor(dto.getColor());
+        vehiculo.setMatricula(dto.getMatricula());
+
+        return vehiculo;
+    }
 
 }
