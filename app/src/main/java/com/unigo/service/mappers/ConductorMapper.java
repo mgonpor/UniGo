@@ -11,14 +11,18 @@ import java.util.List;
 
 public class ConductorMapper {
 
+    // Para el create
     public static Conductor mapDtoToConductor(ConductorRequest conductorRequest){
         Conductor conductor = new Conductor();
 
-        conductor.setId(conductorRequest.getId());
         conductor.setNombre(conductorRequest.getNombre());
         conductor.setNombreUsuario(conductorRequest.getNombreUsuario());
         conductor.setEmail(conductorRequest.getEmail());
         conductor.setPassword(conductorRequest.getPassword());
+
+        conductor.setReputacion(0); // Le damos reputación 0 para empezar
+        conductor.setVehiculos(new ArrayList<>());
+        conductor.setViajes(new ArrayList<>());
 
         return conductor;
     }
@@ -31,7 +35,7 @@ public class ConductorMapper {
         conductorResponse.setNombreUsuario(conductor.getNombreUsuario());
         conductorResponse.setReputacion(conductor.getReputacion());
 
-        List<VehiculoResponse> vehiculos = new ArrayList<VehiculoResponse>();
+        List<VehiculoResponse> vehiculos = new ArrayList<>();
         for (Vehiculo vehiculo : conductor.getVehiculos()) {
             vehiculos.add(VehiculoMapper.mapVehiculoToDto(vehiculo));
         }
