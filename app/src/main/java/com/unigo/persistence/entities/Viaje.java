@@ -28,21 +28,22 @@ public class Viaje {
     @JoinColumn(name = "id_conductor", referencedColumnName = "id", insertable = false, updatable = false)
     private Conductor conductor;
 
+    @Column(nullable = false)
     private String origen;
-
+    @Column(nullable = false)
     private String destino;
 
-    @Column(name = "fecha_salida")
+    @Column(name = "fecha_salida",  nullable = false)
     private LocalDate fechaSalida;
 
-    @Column(name = "plazas_disponibles")
+    @Column(name = "plazas_disponibles",   nullable = false)
     private int plazasDisponibles;
 
-    @Column(name="precio_plaza")
+    @Column(name="precio_plaza", nullable = false)
     private double precioPlaza;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado_reserva")
+    @Column(name = "estado_reserva",  nullable = false)
     private EstadoViaje estadoViaje;
 
     @OneToMany(mappedBy = "viaje")
