@@ -12,8 +12,9 @@ import java.util.List;
 public class ConductorResponse {
 
     private Integer id;
+    private Integer idUsuario;
     private String nombre;
-    private String nombreUsuario;
+    private String username;
     private List<VehiculoResponse> vehiculos;
     private Float reputacion;
 

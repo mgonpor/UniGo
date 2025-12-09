@@ -1,9 +1,7 @@
 package com.unigo.web.controllers;
 
-import com.unigo.service.dtos.ConductorRequest;
 import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.exceptions.ConductorException;
-import com.unigo.service.exceptions.WrongPasswordException;
 import com.unigo.service.services.ConductorService;
 import com.unigo.service.exceptions.ConductorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,38 +27,6 @@ public class ConductorController {
     public ResponseEntity<?> getConductorById(@PathVariable int id){
         try {
             return ResponseEntity.ok(conductorService.findById(id));
-        }catch (ConductorNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody ConductorRequest conductorRequest){
-        try{
-            return ResponseEntity.ok(conductorService.create(conductorRequest));
-        }catch (ConductorException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @PutMapping
-    public ResponseEntity<?> update(@RequestBody ConductorRequest conductorRequest){
-        try{
-            return ResponseEntity.ok(conductorService.update( conductorRequest));
-        }catch (ConductorNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (ConductorException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }catch (WrongPasswordException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable int id){
-        try {
-            conductorService.delete(id);
-            return ResponseEntity.ok().body("Conductor con id " +  id + " eliminado con éxito.");
         }catch (ConductorNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
