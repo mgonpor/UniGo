@@ -6,13 +6,11 @@ import com.unigo.auth.dtos.RegisterRequest;
 import com.unigo.security.config.JwtService;
 import com.unigo.security.user.UsuarioRepository;
 import com.unigo.service.exceptions.DuplicateResourceException;
-import com.unigo.service.exceptions.UsuarioNotFoundException;
-import com.unigo.service.services.PasajeroService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +23,11 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private PasajeroService pasajeroService;
-
     public AuthResponse register(RegisterRequest request) {
-        try{
+        try{                                                            // todo: finales email
+            if (request.getEmail() == null /*|| !request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")*/){
+                throw new IllegalArgumentException("Email invalido o vacío");
+            }
             if (usuarioRepository.existsByEmail(request.getEmail())) {
                 throw new DuplicateResourceException("Email ya registrado");
             }
@@ -41,8 +39,6 @@ public class AuthService {
             user.setPassword(encoder.encode(request.getPassword()));
 
             var savedUser = usuarioRepository.save(user);
-
-            pasajeroService.autoCreate(savedUser.getId()); // throws UsuarioNotFound or DuplicateResource
 
             var jwtToken = jwtService.generateJwtToken(savedUser);
             return new AuthResponse(jwtToken);
@@ -63,7 +59,7 @@ public class AuthService {
         );
                                                     // todo: también con email
         var user = usuarioRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         var jwtToken = jwtService.generateJwtToken(user);
         return new AuthResponse(jwtToken);
