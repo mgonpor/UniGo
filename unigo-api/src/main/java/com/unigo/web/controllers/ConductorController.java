@@ -3,7 +3,6 @@ package com.unigo.web.controllers;
 import com.unigo.security.user.Usuario;
 import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.dtos.VehiculoRequest;
-import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.*;
 import com.unigo.service.services.ConductorService;
 import com.unigo.service.services.VehiculoService;
@@ -15,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 
 @RestController
