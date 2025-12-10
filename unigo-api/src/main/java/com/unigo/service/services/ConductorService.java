@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +24,7 @@ public class ConductorService {
     @Autowired
     private UsuarioService usuarioService;
 
-    // TODO: ADMIN check Controller
+    // ADMIN
     public List<ConductorResponse> findAll(){
         return conductorRepository.findAll()
                 .stream()
@@ -41,8 +42,8 @@ public class ConductorService {
         return ConductorMapper.mapConductorToDto(conductor);
     }
 
-    //TODO: NO ENDPOINT, se llama desde VehiculoService.create()
-    public void autoCreate(int idUsuario){
+    // Se llama desde VehiculoService.createVehiculo()
+    public Conductor autoCreate(int idUsuario){
         if(!usuarioService.existsById(idUsuario)){
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
@@ -52,7 +53,7 @@ public class ConductorService {
         Conductor c = new Conductor();
         c.setIdUsuario(idUsuario);
         c.setReputacion(0);
-        conductorRepository.save(c);
+        return conductorRepository.save(c);
     }
 
     // CRUDs Vehiculo
@@ -79,6 +80,10 @@ public class ConductorService {
     // AUX
     public boolean isUsuario(int idConductor, int idUsuario) {
         return conductorRepository.existsByIdAndIdUsuario(idConductor, idUsuario);
+    }
+
+    public Optional<Conductor> findConductor(int idUsuario){
+        return conductorRepository.findByIdUsuario(idUsuario);
     }
 
 }

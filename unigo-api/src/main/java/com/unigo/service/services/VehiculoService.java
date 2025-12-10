@@ -20,50 +20,12 @@ public class VehiculoService {
     @Autowired
     private VehiculoRepository vehiculoRepository;
 
+    @Autowired
+    private ConductorService conductorService;
+
     // ADMIN
-    public List<VehiculoResponse> findAll(){
-        return vehiculoRepository.findAll().stream()
-                .map(VehiculoMapper::mapVehiculoToDto)
-                .toList();
-    }
 
-    public VehiculoResponse findById(int idVehiculo){
-        if (!vehiculoRepository.existsById(idVehiculo)){
-            throw new VehiculoNotFoundException("Vehiculo no encontrado");
-        }
-        return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
-    }
-
-    public VehiculoResponse createAdmin(int idConductor, VehiculoRequest vehiculoRequest){
-        Vehiculo vehiculo = VehiculoMapper.mapDtoToVehiculo(vehiculoRequest);
-        vehiculo.setIdConductor(idConductor);
-        vehiculoRepository.save(vehiculo);
-        return VehiculoMapper.mapVehiculoToDto(vehiculo);
-    }
-
-    public VehiculoResponse updateAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest){
-        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
-            throw new VehiculoNotFoundException("Vehiculo no encontrado");
-        }
-        Vehiculo vDB = this.vehiculoRepository.findById(idVehiculo).get();
-        vDB.setMarca(vehiculoRequest.getMarca());
-        vDB.setModelo(vehiculoRequest.getModelo());
-        vDB.setColor(vehiculoRequest.getColor());
-        vDB.setMatricula(vehiculoRequest.getMatricula());
-        this.vehiculoRepository.save(vDB);
-        return VehiculoMapper.mapVehiculoToDto(vDB);
-    }
-
-    public String deleteAdmin(int idVehiculo){
-        if (!vehiculoRepository.existsById(idVehiculo)){
-            throw new VehiculoNotFoundException("Vehiculo no encontrado");
-        }
-        this.vehiculoRepository.deleteById(idVehiculo);
-        return "Vehiculo " + idVehiculo + " eliminado";
-    }
-
-    //  CRUDs USER
-    // TODO: pasar comprobaciones con Usuario y Conductor a ConductorService
+    // CRUDs USER
     public List<VehiculoResponse> getVehiculosByIdConductor(int idConductor, int idUsuario) {
         if(!conductorService.isUsuario(idConductor, idUsuario)){
             throw new ConductorException("Id conductor incorrecto");
@@ -77,7 +39,7 @@ public class VehiculoService {
         if(!conductorService.isUsuario(idConductor, idUsuario)){
             throw new ConductorException("Id conductor incorrecto");
         }
-        if(!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
+        if(!perteneceAConductor(idVehiculo, idConductor)){
             throw new VehiculoNotFoundException("Vehiculo no encontrado");
         }
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
@@ -93,4 +55,10 @@ public class VehiculoService {
 
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.save(v));
     }
+
+    // AUX
+    public boolean perteneceAConductor(int idVehiculo, int idConductor){
+        return vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor);
+    }
+
 }
