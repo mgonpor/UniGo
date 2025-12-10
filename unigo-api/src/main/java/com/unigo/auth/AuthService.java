@@ -29,10 +29,7 @@ public class AuthService {
     private PasajeroService pasajeroService;
 
     public AuthResponse register(RegisterRequest request) {
-        try{                                                            // todo: finales email
-            if (request.getEmail() == null /*|| !request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")*/){
-                throw new IllegalArgumentException("Email invalido o vacío");
-            }
+        try{
             if (usuarioRepository.existsByEmail(request.getEmail())) {
                 throw new DuplicateResourceException("Email ya registrado");
             }

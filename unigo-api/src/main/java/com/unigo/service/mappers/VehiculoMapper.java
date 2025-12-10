@@ -19,8 +19,8 @@ public class VehiculoMapper {
 
     public static Vehiculo mapDtoToVehiculo(VehiculoRequest dto) {
         Vehiculo vehiculo = new Vehiculo();
+
         vehiculo.setId(dto.getId());
-        vehiculo.setIdConductor(dto.getIdConductor());
         vehiculo.setMarca(dto.getMarca());
         vehiculo.setModelo(dto.getModelo());
         vehiculo.setColor(dto.getColor());
