@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Pasajero extends Usuario {
+public class Pasajero {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

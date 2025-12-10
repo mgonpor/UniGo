@@ -6,11 +6,13 @@ import com.unigo.auth.dtos.RegisterRequest;
 import com.unigo.security.config.JwtService;
 import com.unigo.security.user.UsuarioRepository;
 import com.unigo.service.exceptions.DuplicateResourceException;
+import com.unigo.service.exceptions.UsuarioNotFoundException;
+import com.unigo.service.services.PasajeroService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,9 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasajeroService pasajeroService;
 
     public AuthResponse register(RegisterRequest request) {
         try{                                                            // todo: finales email
@@ -39,6 +44,8 @@ public class AuthService {
             user.setPassword(encoder.encode(request.getPassword()));
 
             var savedUser = usuarioRepository.save(user);
+
+            pasajeroService.autoCreate(savedUser.getId()); // throws UsuarioNotFound or DuplicateResource
 
             var jwtToken = jwtService.generateJwtToken(savedUser);
             return new AuthResponse(jwtToken);
@@ -59,7 +66,7 @@ public class AuthService {
         );
                                                     // todo: también con email
         var user = usuarioRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
 
         var jwtToken = jwtService.generateJwtToken(user);
         return new AuthResponse(jwtToken);

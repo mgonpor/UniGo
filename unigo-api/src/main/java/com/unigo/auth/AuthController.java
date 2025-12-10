@@ -3,6 +3,7 @@ package com.unigo.auth;
 import com.unigo.auth.dtos.AuthRequest;
 import com.unigo.auth.dtos.RegisterRequest;
 import com.unigo.service.exceptions.DuplicateResourceException;
+import com.unigo.service.exceptions.UsuarioNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,10 +32,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (UsernameNotFoundException e) {
+        } catch (UsernameNotFoundException | UsuarioNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage() + " : " + e.getCause().getMessage());
         }
     }
 
@@ -42,7 +43,7 @@ public class AuthController {
     public ResponseEntity<?> authenticate(@Valid @RequestBody AuthRequest request) {
         try {
             return ResponseEntity.ok(authService.authenticate(request));
-        }catch (UsernameNotFoundException e) {
+        }catch (UsuarioNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());

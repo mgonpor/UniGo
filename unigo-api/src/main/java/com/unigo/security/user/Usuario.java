@@ -17,7 +17,6 @@ import java.util.List;
         @UniqueConstraint(columnNames = "email"),
         @UniqueConstraint(columnNames = "username")
 })
-@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 public class Usuario implements UserDetails {
@@ -51,7 +50,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
