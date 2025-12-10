@@ -5,6 +5,8 @@ import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.exceptions.ConductorException;
 import com.unigo.service.exceptions.ConductorNotFoundException;
+import com.unigo.service.exceptions.DuplicateResourceException;
+import com.unigo.service.exceptions.UsuarioNotFoundException;
 import com.unigo.service.mappers.ConductorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,10 @@ public class ConductorService {
     @Autowired
     private ConductorRepository conductorRepository;
 
-    // CRUDs Conductor
+    @Autowired
+    private UsuarioService usuarioService;
 
+    // TODO: ADMIN check Controller
     public List<ConductorResponse> findAll(){
         return conductorRepository.findAll()
                 .stream()
@@ -37,8 +41,19 @@ public class ConductorService {
         return ConductorMapper.mapConductorToDto(conductor);
     }
 
-    //TODO: DESPUÉS SE CREARÁN USUARIOS COMO PASAJEROS
-    // Y SE CREARÁN LOS CONDUCTORES AL AÑADIR UN VEHÍCULO
+    //TODO: NO ENDPOINT, se llama desde VehiculoService.create()
+    public void autoCreate(int idUsuario){
+        if(!usuarioService.existsById(idUsuario)){
+            throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
+        }
+        if(conductorRepository.existsByIdUsuario(idUsuario)){
+            throw new DuplicateResourceException("Conductor ya existente");
+        }
+        Conductor c = new Conductor();
+        c.setIdUsuario(idUsuario);
+        c.setReputacion(0);
+        conductorRepository.save(c);
+    }
 
     // CRUDs Vehiculo
 
@@ -60,4 +75,10 @@ public class ConductorService {
 
         return lista;
     }
+
+    // AUX
+    public boolean isUsuario(int idConductor, int idUsuario) {
+        return conductorRepository.existsByIdAndIdUsuario(idConductor, idUsuario);
+    }
+
 }

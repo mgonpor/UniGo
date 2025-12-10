@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface ConductorRepository extends JpaRepository<Conductor,Integer> {
 
-    List<Conductor> findByReputacionGreaterThanEqual(float reputacion);
+    boolean existsByIdUsuario(int idUsuario);
 
+    boolean existsByIdAndIdUsuario(int id, int idUsuario);
+
+    List<Conductor> findByReputacionGreaterThanEqual(float reputacion);
 }

@@ -28,18 +28,6 @@ public class Pasajero {
     @JsonIgnore
     private Usuario usuario;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(name = "id_usuario")
-    private int idUsuario;
-
-    @OneToOne
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id", insertable = false, updatable = false)
-    @JsonIgnore
-    private Usuario usuario;
-
     @OneToMany(mappedBy = "pasajero")
     @JsonIgnore
     List<Reserva> reservas;
