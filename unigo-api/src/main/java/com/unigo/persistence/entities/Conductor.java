@@ -1,9 +1,8 @@
 package com.unigo.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.unigo.security.user.Usuario;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,19 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Conductor extends Usuario {
+public class Conductor {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(name = "id_usuario")
+    private int idUsuario;
+
+    @OneToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id", insertable = false, updatable = false)
+    @JsonIgnore
+    private Usuario usuario;
 
     private float reputacion;
 

@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ConductorRequest {
+public class PasajeroResponse {
 
+    private Integer id;
+    private Integer idUsuario;
     private String nombre;
-    private String nombreUsuario;
-    private String email;
-    private String password;
+    private String username;
 
 }
