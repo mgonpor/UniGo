@@ -96,6 +96,7 @@ public class ConductorController {
     // delete tampoco ya que tendria que quitar los coches
 
     @GetMapping("/search/reputacion")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> findByReputacionGreaterThanEqual(@RequestParam float mayorQue,
                                                               @AuthenticationPrincipal Usuario usuario){
         try{
