@@ -6,10 +6,13 @@ import com.unigo.persistence.repositories.VehiculoRepository;
 import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.ConductorException;
+import com.unigo.service.exceptions.ConductorNotFoundException;
 import com.unigo.service.exceptions.VehiculoNotFoundException;
 import com.unigo.service.mappers.VehiculoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +23,50 @@ public class VehiculoService {
     @Autowired
     private VehiculoRepository vehiculoRepository;
 
-    @Autowired
-    private ConductorService conductorService;
-
     // ADMIN
+    public List<VehiculoResponse> findAll(){
+        return vehiculoRepository.findAll().stream()
+                .map(VehiculoMapper::mapVehiculoToDto)
+                .toList();
+    }
 
-    // CRUDs USER
+    public VehiculoResponse findById(int idVehiculo){
+        if (!vehiculoRepository.existsById(idVehiculo)){
+            throw new VehiculoNotFoundException("Vehiculo no encontrado");
+        }
+        return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
+    }
+
+    public VehiculoResponse createAdmin(int idConductor, VehiculoRequest vehiculoRequest){
+        Vehiculo vehiculo = VehiculoMapper.mapDtoToVehiculo(vehiculoRequest);
+        vehiculo.setIdConductor(idConductor);
+        vehiculoRepository.save(vehiculo);
+        return VehiculoMapper.mapVehiculoToDto(vehiculo);
+    }
+
+    public VehiculoResponse updateAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest){
+        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
+            throw new VehiculoNotFoundException("Vehiculo no encontrado");
+        }
+        Vehiculo vDB = this.vehiculoRepository.findById(idVehiculo).get();
+        vDB.setMarca(vehiculoRequest.getMarca());
+        vDB.setModelo(vehiculoRequest.getModelo());
+        vDB.setColor(vehiculoRequest.getColor());
+        vDB.setMatricula(vehiculoRequest.getMatricula());
+        this.vehiculoRepository.save(vDB);
+        return VehiculoMapper.mapVehiculoToDto(vDB);
+    }
+
+    public String deleteAdmin(int idVehiculo){
+        if (!vehiculoRepository.existsById(idVehiculo)){
+            throw new VehiculoNotFoundException("Vehiculo no encontrado");
+        }
+        this.vehiculoRepository.deleteById(idVehiculo);
+        return "Vehiculo " + idVehiculo + " eliminado";
+    }
+
+    //  CRUDs USER
+    // TODO: pasar comprobaciones con Usuario y Conductor a ConductorService
     public List<VehiculoResponse> getVehiculosByIdConductor(int idConductor, int idUsuario) {
         if(!conductorService.isUsuario(idConductor, idUsuario)){
             throw new ConductorException("Id conductor incorrecto");
@@ -39,7 +80,7 @@ public class VehiculoService {
         if(!conductorService.isUsuario(idConductor, idUsuario)){
             throw new ConductorException("Id conductor incorrecto");
         }
-        if(!perteneceAConductor(idVehiculo, idConductor)){
+        if(!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
             throw new VehiculoNotFoundException("Vehiculo no encontrado");
         }
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
@@ -55,10 +96,4 @@ public class VehiculoService {
 
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.save(v));
     }
-
-    // AUX
-    public boolean perteneceAConductor(int idVehiculo, int idConductor){
-        return vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor);
-    }
-
 }

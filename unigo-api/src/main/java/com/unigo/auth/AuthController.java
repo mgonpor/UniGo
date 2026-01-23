@@ -31,7 +31,7 @@ public class AuthController {
             return ResponseEntity.ok(authService.register(request));
         }catch (DuplicateResourceException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (UsernameNotFoundException | UsuarioNotFoundException e) {
+        } catch (UsuarioNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage() + " : " + e.getCause().getMessage());
