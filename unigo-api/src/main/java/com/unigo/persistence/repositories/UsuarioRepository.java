@@ -1,5 +1,6 @@
-package com.unigo.security.user;
+package com.unigo.persistence.repositories;
 
+import com.unigo.persistence.entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

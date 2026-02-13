@@ -1,6 +1,6 @@
 package com.unigo.web.controllers;
 
-import com.unigo.security.user.Usuario;
+import com.unigo.persistence.entities.Usuario;
 import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.ConductorNotFoundException;

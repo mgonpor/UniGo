@@ -1,15 +1,10 @@
-package com.unigo.security.user;
+package com.unigo.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.unigo.persistence.entities.Mensaje;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -19,7 +14,7 @@ import java.util.List;
 })
 @Getter
 @Setter
-public class Usuario implements UserDetails {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +32,7 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String rol;
 
     @OneToMany(mappedBy = "remitente")
     @JsonIgnore
@@ -47,19 +41,4 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "destinatario")
     @JsonIgnore
     private List<Mensaje> recibidos;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
 }
