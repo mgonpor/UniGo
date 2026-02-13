@@ -3,6 +3,8 @@ package com.unigo.service.services;
 import com.unigo.persistence.entities.Conductor;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.service.dtos.ConductorResponse;
+import com.unigo.service.dtos.VehiculoRequest;
+import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.ConductorException;
 import com.unigo.service.exceptions.ConductorNotFoundException;
 import com.unigo.service.exceptions.DuplicateResourceException;
@@ -24,6 +26,9 @@ public class ConductorService {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private VehiculoService vehiculoService;
+
     // ADMIN
     public List<ConductorResponse> findAll(){
         return conductorRepository.findAll()
@@ -42,8 +47,49 @@ public class ConductorService {
         return ConductorMapper.mapConductorToDto(conductor);
     }
 
-    // Se llama desde VehiculoService.createVehiculo()
-    public Conductor autoCreate(int idUsuario){
+    public ConductorResponse create(int idUsuario){
+        return ConductorMapper.mapConductorToDto(this.autoCreate(idUsuario));
+    }
+
+    public ConductorResponse update(int idConductor, Conductor conductor){
+        if(!conductorRepository.existsById(idConductor)){
+            throw new ConductorNotFoundException("Conductor " + idConductor + " no encontrado.");
+        }
+        if (idConductor != conductor.getId()){
+            throw new ConductorException("Inconsistencia con identificador " + idConductor);
+        }
+        if(!this.isUsuario(idConductor, conductor.getIdUsuario())){
+            throw new ConductorException("Id conductor incorrecto");
+        }
+        Conductor cDB = conductorRepository.findById(idConductor).get();
+        if (conductor.getReputacion() > 5){
+            throw new ConductorException("Reputación no puede ser mayor a 5.");
+        }
+        cDB.setReputacion(conductor.getReputacion());
+        conductorRepository.save(cDB);
+        return ConductorMapper.mapConductorToDto(cDB);
+    }
+
+    public String delete(int idConductor){
+        if(!conductorRepository.existsById(idConductor)){
+            throw new ConductorNotFoundException("Conductor " + idConductor + " no encontrado.");
+        }
+        conductorRepository.deleteById(idConductor);
+        return "Conductor " + idConductor + " eliminado.";
+    }
+
+    // CRUDs normales
+    // por el usuario
+    public ConductorResponse getMeConductor(int idUsuario){
+        Optional<Conductor> c = this.findConductor(idUsuario);
+        if (c.isEmpty()){
+            throw new ConductorNotFoundException("No eres conductor aún");
+        }
+        return ConductorMapper.mapConductorToDto(c.get());
+    }
+
+    // Se llama desde CreateConductorAdmin y CreateVehiculoUser (en este servicio)
+    private Conductor autoCreate(int idUsuario){
         if(!usuarioService.existsById(idUsuario)){
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
@@ -56,9 +102,7 @@ public class ConductorService {
         return conductorRepository.save(c);
     }
 
-    // CRUDs Vehiculo
-
-    // POSIBLES MÉTODOS
+    // otro
     public List<ConductorResponse> findByReputacionGreaterThanEqual(float reputacionMayorQue){
 
         if(reputacionMayorQue > 5 || reputacionMayorQue < 0){
@@ -76,6 +120,26 @@ public class ConductorService {
 
         return lista;
     }
+
+    // aux CRUDs Vehiculo admin
+    // create admin
+    public VehiculoResponse createVehiculoAdmin(int idConductor, VehiculoRequest vehiculoRequest){
+        if (!conductorRepository.existsById(idConductor)){
+            throw new ConductorNotFoundException("Conductor no encontrado");
+        }
+        return vehiculoService.createAdmin(idConductor, vehiculoRequest);
+    }
+
+    // update admin
+    public VehiculoResponse updateVehiculoAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest){
+        if (!conductorRepository.existsById(idConductor)){
+            throw new ConductorNotFoundException("Conductor no encontrado");
+        }
+        return vehiculoService.updateAdmin(idVehiculo, idConductor, vehiculoRequest);
+    }
+
+    // TODO: aux CRUDs Vehiculo USER (comprobaciones usuario)
+
 
     // AUX
     public boolean isUsuario(int idConductor, int idUsuario) {

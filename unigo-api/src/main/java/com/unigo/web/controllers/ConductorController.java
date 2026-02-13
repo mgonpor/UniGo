@@ -1,5 +1,6 @@
 package com.unigo.web.controllers;
 
+import com.unigo.persistence.entities.Conductor;
 import com.unigo.security.user.Usuario;
 import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.dtos.VehiculoRequest;
@@ -27,13 +28,13 @@ public class ConductorController {
     private VehiculoService vehiculoService;
 
     // CONDUCTOR ADMIN
-    @GetMapping
+    @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ConductorResponse>> findAll(@AuthenticationPrincipal Usuario usuario){
         return ResponseEntity.ok(conductorService.findAll());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getConductorById(@PathVariable int id, @AuthenticationPrincipal Usuario usuario){
         try {
@@ -43,8 +44,59 @@ public class ConductorController {
         }
     }
 
+    @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createConductor(@RequestParam int idUsuario, @AuthenticationPrincipal Usuario usuario){
+        try{
+            return ResponseEntity.ok(conductorService.create(idUsuario));
+        }catch (UsuarioNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (DuplicateResourceException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
+
+    // TODO: Conductor solo cambia la reputación
+    @PutMapping("/admin/{idConductor}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateConductor(@PathVariable int idConductor, @RequestBody Conductor conductor,
+                                             @AuthenticationPrincipal Usuario usuario){
+        try{
+            return ResponseEntity.ok(conductorService.update(idConductor, conductor));
+        }catch (ConductorNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }catch (ConductorException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/admin/{idConductor}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteConductor(@PathVariable int idConductor, @AuthenticationPrincipal Usuario usuario){
+        try{
+            return ResponseEntity.ok(conductorService.delete(idConductor));
+        }catch (ConductorNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     // CONDUCTOR USER
+    // no hay getAll
+    // get el usuario
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@AuthenticationPrincipal Usuario usuario){
+        try{
+            return ResponseEntity.ok(this.conductorService.getMeConductor(usuario.getId()));
+        }catch (ConductorNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    // no hay create
+    // update no tiene sentido
+    // delete tampoco ya que tendria que quitar los coches
+
     @GetMapping("/search/reputacion")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<?> findByReputacionGreaterThanEqual(@RequestParam float mayorQue,
                                                               @AuthenticationPrincipal Usuario usuario){
         try{
@@ -56,9 +108,7 @@ public class ConductorController {
         }
     }
 
-    // VEHICULO ADMIN
-
-    // VEHICULO USER
+    //TODO: pasar a VehiculoController VEHICULO USER
     @GetMapping("/{idConductor}/vehiculos")
     public ResponseEntity<?> getVehiculosByIdConductor(@PathVariable int idConductor,
                                                        @AuthenticationPrincipal Usuario usuario){
@@ -83,7 +133,7 @@ public class ConductorController {
     }
 
     @PostMapping("/vehiculo")
-    @PreAuthorize("hasRole('USER')")                // todo: GlobalExceptionHandler
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> createVehiculo(@Valid @RequestBody VehiculoRequest request,
                                                            @AuthenticationPrincipal Usuario usuario){
         try{

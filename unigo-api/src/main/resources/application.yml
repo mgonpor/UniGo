@@ -28,3 +28,7 @@ spring:
 jwt:
   secret: ${JWT_SECRET:'2f5626185baf25cf286a0d831255970395de10fd29122a2bed6df10ea591f382W'}
   expiration: 86400000
+
+frontend:
+  url: ${FRONTEND_URLS:'localhost:4200'}
+  #ver que puerto usará React
