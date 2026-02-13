@@ -1,7 +1,7 @@
 package com.unigo.service.mappers;
 
 import com.unigo.persistence.entities.Pasajero;
-import com.unigo.security.user.Usuario;
+import com.unigo.persistence.entities.Usuario;
 import com.unigo.service.dtos.PasajeroResponse;
 
 public class PasajeroMapper {

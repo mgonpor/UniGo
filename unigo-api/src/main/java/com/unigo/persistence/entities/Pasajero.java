@@ -1,7 +1,6 @@
 package com.unigo.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.unigo.security.user.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
