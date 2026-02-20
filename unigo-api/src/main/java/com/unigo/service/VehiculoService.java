@@ -14,6 +14,19 @@ import java.util.List;
 @Service
 public class VehiculoService {
 
+    /*
+    *
+    * TODO:
+    *  - CAMBIAR ROLES, AÑADIR PASAJERO Y CONDUCTOR
+    *  - ELIMINAR CLASES, REPOSITORIOS, DTOS Y MAPPERS
+    *  - AUTOCREATE CON ROL PASAJERO
+    *  - USAR ESTOS ROLES EN SecurityConfiguration
+    *  - UNIR CONTROLADORES
+    *  - ARREGLAR Vehiculo Service Y Controller
+    *  - REESTRUCTURAR SQL
+    *
+    * */
+
     @Autowired
     private VehiculoRepository vehiculoRepository;
 
@@ -60,7 +73,6 @@ public class VehiculoService {
     }
 
     //  CRUDs USER
-    // TODO: pasar comprobaciones con Usuario y Conductor a ConductorService
     /*public List<VehiculoResponse> getVehiculosByIdConductor(int idConductor, int idUsuario) {
         if(!conductorService.isUsuario(idConductor, idUsuario)){
             throw new ConductorException("Id conductor incorrecto");

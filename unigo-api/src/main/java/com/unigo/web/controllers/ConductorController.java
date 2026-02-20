@@ -54,7 +54,6 @@ public class ConductorController {
         }
     }
 
-    // TODO: Conductor solo cambia la reputación
     @PutMapping("/admin/{idConductor}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateConductor(@PathVariable int idConductor, @RequestBody Conductor conductor,
@@ -106,7 +105,6 @@ public class ConductorController {
         }
     }
 
-    //TODO: pasar a VehiculoController VEHICULO USER
     /*@GetMapping("/{idConductor}/vehiculos")
     public ResponseEntity<?> getVehiculosByIdConductor(@PathVariable int idConductor,
                                                        @AuthenticationPrincipal Usuario usuario){
