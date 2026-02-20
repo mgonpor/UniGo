@@ -82,7 +82,7 @@ public class ConductorService {
     // CRUDs normales
     // por el usuario
     public ConductorResponse getMeConductor(int idUsuario){
-        Optional<Conductor> c = this.findConductor(idUsuario);
+        Optional<Conductor> c = conductorRepository.findByIdUsuario(idUsuario);
         if (c.isEmpty()){
             throw new ConductorNotFoundException("No eres conductor aún");
         }
@@ -145,10 +145,6 @@ public class ConductorService {
     // AUX
     public boolean isUsuario(int idConductor, int idUsuario) {
         return conductorRepository.existsByIdAndIdUsuario(idConductor, idUsuario);
-    }
-
-    public Optional<Conductor> findConductor(int idUsuario){
-        return conductorRepository.findByIdUsuario(idUsuario);
     }
 
 }
