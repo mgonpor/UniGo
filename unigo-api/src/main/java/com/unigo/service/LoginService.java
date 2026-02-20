@@ -1,4 +1,4 @@
-package com.unigo.service.services;
+package com.unigo.service;
 
 import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;

@@ -1,4 +1,4 @@
-package com.unigo.service.services;
+package com.unigo.service;
 
 import com.unigo.persistence.entities.Usuario;
 import com.unigo.persistence.repositories.UsuarioRepository;

@@ -1,4 +1,4 @@
-package com.unigo.service.services;
+package com.unigo.service;
 
 import com.unigo.persistence.entities.Conductor;
 import com.unigo.persistence.repositories.ConductorRepository;

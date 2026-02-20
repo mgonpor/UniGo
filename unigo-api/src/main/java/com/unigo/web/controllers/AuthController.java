@@ -3,7 +3,7 @@ package com.unigo.web.controllers;
 import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
-import com.unigo.service.services.LoginService;
+import com.unigo.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

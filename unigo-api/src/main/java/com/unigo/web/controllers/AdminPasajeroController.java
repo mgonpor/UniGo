@@ -4,7 +4,7 @@ import com.unigo.persistence.entities.Usuario;
 import com.unigo.service.dtos.PasajeroResponse;
 import com.unigo.service.exceptions.DuplicateResourceException;
 import com.unigo.service.exceptions.UsuarioNotFoundException;
-import com.unigo.service.services.PasajeroService;
+import com.unigo.service.PasajeroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

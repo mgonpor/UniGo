@@ -1,18 +1,15 @@
-package com.unigo.service.services;
+package com.unigo.service;
 
-import com.unigo.persistence.entities.Conductor;
 import com.unigo.persistence.entities.Vehiculo;
 import com.unigo.persistence.repositories.VehiculoRepository;
 import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
-import com.unigo.service.exceptions.ConductorException;
 import com.unigo.service.exceptions.VehiculoNotFoundException;
 import com.unigo.service.mappers.VehiculoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VehiculoService {
