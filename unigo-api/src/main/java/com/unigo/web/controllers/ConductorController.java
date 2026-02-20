@@ -109,7 +109,7 @@ public class ConductorController {
     }
 
     //TODO: pasar a VehiculoController VEHICULO USER
-    @GetMapping("/{idConductor}/vehiculos")
+    /*@GetMapping("/{idConductor}/vehiculos")
     public ResponseEntity<?> getVehiculosByIdConductor(@PathVariable int idConductor,
                                                        @AuthenticationPrincipal Usuario usuario){
         try{
@@ -143,6 +143,6 @@ public class ConductorController {
         }catch (DuplicateResourceException e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
-    }
+    }*/
 
 }

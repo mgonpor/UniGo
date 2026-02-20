@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/conductores")
+@RequestMapping("/admin/conductores")
 public class VehiculoController {
 
     @Autowired
@@ -29,13 +29,13 @@ public class VehiculoController {
     private ConductorService conductorService;
 
     // ADMIN
-    @GetMapping("/admin")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<VehiculoResponse>> findAll(@AuthenticationPrincipal Usuario usuario){
         return ResponseEntity.ok(this.vehiculoService.findAll());
     }
 
-    @GetMapping("/admin/{idVehiculo}")
+    @GetMapping("/{idVehiculo}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> findById(@PathVariable int idVehiculo, @AuthenticationPrincipal Usuario usuario){
         try{
@@ -45,7 +45,7 @@ public class VehiculoController {
         }
     }
 
-    @PostMapping("/admin")
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> create(@RequestParam int idConductor, @Valid @RequestBody VehiculoRequest vehiculoRequest,
                                     @AuthenticationPrincipal Usuario usuario){
@@ -56,7 +56,7 @@ public class VehiculoController {
         }
     }
 
-    @PutMapping("/admin/{idVehiculo}")
+    @PutMapping("/{idVehiculo}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> update(@PathVariable int idVehiculo, @RequestParam int idConductor,
                                     @Valid @RequestBody VehiculoRequest vehiculoRequest,
@@ -68,7 +68,7 @@ public class VehiculoController {
         }
     }
 
-    @DeleteMapping("/admin/{idVehiculo}")
+    @DeleteMapping("/{idVehiculo}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable int idVehiculo, @AuthenticationPrincipal Usuario usuario){
         try{

@@ -2,6 +2,7 @@ package com.unigo.service.services;
 
 import com.unigo.persistence.entities.Pasajero;
 import com.unigo.persistence.repositories.PasajeroRepository;
+import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.service.dtos.PasajeroResponse;
 import com.unigo.service.exceptions.DuplicateResourceException;
 import com.unigo.service.exceptions.UsuarioNotFoundException;
@@ -18,7 +19,7 @@ public class PasajeroService {
     private PasajeroRepository pasajeroRepository;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioRepository usuarioRepository;
 
     // ADMIN
     public List<PasajeroResponse> getPasajeros() {
@@ -28,7 +29,7 @@ public class PasajeroService {
     }
 
     public PasajeroResponse createPasajero(int idUsuario) {
-        if(!usuarioService.existsById(idUsuario)){
+        if(!usuarioRepository.existsById(idUsuario)){
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
         if(pasajeroRepository.existsByIdUsuario(idUsuario)){
@@ -42,7 +43,7 @@ public class PasajeroService {
 
     // NO ENDPOINT, se llama desde AuthService.register()
     public void autoCreate(int idUsuario) {
-        if(!usuarioService.existsById(idUsuario)){
+        if(!usuarioRepository.existsById(idUsuario)){
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
         if(pasajeroRepository.existsByIdUsuario(idUsuario)){

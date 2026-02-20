@@ -64,7 +64,7 @@ public class VehiculoService {
 
     //  CRUDs USER
     // TODO: pasar comprobaciones con Usuario y Conductor a ConductorService
-    public List<VehiculoResponse> getVehiculosByIdConductor(int idConductor, int idUsuario) {
+    /*public List<VehiculoResponse> getVehiculosByIdConductor(int idConductor, int idUsuario) {
         if(!conductorService.isUsuario(idConductor, idUsuario)){
             throw new ConductorException("Id conductor incorrecto");
         }
@@ -92,5 +92,5 @@ public class VehiculoService {
         v.setIdConductor(idConductor);
 
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.save(v));
-    }
+    }*/
 }

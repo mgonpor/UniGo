@@ -2,6 +2,7 @@ package com.unigo.service.services;
 
 import com.unigo.persistence.entities.Conductor;
 import com.unigo.persistence.repositories.ConductorRepository;
+import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
@@ -24,7 +25,7 @@ public class ConductorService {
     private ConductorRepository conductorRepository;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private VehiculoService vehiculoService;
@@ -90,7 +91,7 @@ public class ConductorService {
 
     // Se llama desde CreateConductorAdmin y CreateVehiculoUser (en este servicio)
     private Conductor autoCreate(int idUsuario){
-        if(!usuarioService.existsById(idUsuario)){
+        if(!usuarioRepository.existsById(idUsuario)){
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
         if(conductorRepository.existsByIdUsuario(idUsuario)){
