@@ -1,7 +1,6 @@
 package com.unigo.service;
 
 import com.unigo.persistence.entities.Conductor;
-import com.unigo.persistence.entities.Pasajero;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.service.dtos.ConductorResponse;
@@ -9,7 +8,6 @@ import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.*;
 import com.unigo.service.mappers.ConductorMapper;
-import com.unigo.service.mappers.PasajeroMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
