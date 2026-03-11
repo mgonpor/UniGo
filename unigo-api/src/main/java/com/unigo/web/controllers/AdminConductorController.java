@@ -48,37 +48,4 @@ public class AdminConductorController {
         return ResponseEntity.ok(conductorService.findByReputacionGreaterThanEqual(mayorQue));
     }
 
-    /*@GetMapping("/{idConductor}/vehiculos")
-    public ResponseEntity<?> getVehiculosByIdConductor(@PathVariable int idConductor){
-        try{
-            return ResponseEntity.ok(vehiculoService.getVehiculosByIdConductor(idConductor, usuario.getId()));
-        }catch (ConductorException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/{idConductor}/vehiculos/{idVehiculo}")
-    public ResponseEntity<?> getVehiculoByIdAndIdConductor(@PathVariable int idConductor,
-                                                           @PathVariable int idVehiculo){
-        try{
-            return ResponseEntity.ok(vehiculoService.getVehiculoByIdAndIdConductor(idVehiculo, idConductor, usuario.getId()));
-        }catch (ConductorException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }catch (VehiculoNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/vehiculo")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createVehiculo(@Valid @RequestBody VehiculoRequest request){
-        try{
-            return ResponseEntity.ok(vehiculoService.createVehiculo(request, usuario.getId()));
-        }catch (UsuarioNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }catch (DuplicateResourceException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-    }*/
-
 }
