@@ -1,9 +1,11 @@
 package com.unigo.service;
 
 import com.unigo.persistence.entities.Vehiculo;
+import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.VehiculoRepository;
 import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
+import com.unigo.service.exceptions.ConductorNotFoundException;
 import com.unigo.service.exceptions.VehiculoNotFoundException;
 import com.unigo.service.mappers.VehiculoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +16,11 @@ import java.util.List;
 @Service
 public class VehiculoService {
 
-    /*
-    *
-    * TODO:
-    *  - CAMBIAR ROLES, AÑADIR PASAJERO Y CONDUCTOR
-    *  - ELIMINAR CLASES, REPOSITORIOS, DTOS Y MAPPERS
-    *  - AUTOCREATE CON ROL PASAJERO
-    *  - USAR ESTOS ROLES EN SecurityConfiguration
-    *  - UNIR CONTROLADORES
-    *  - ARREGLAR Vehiculo Service Y Controller
-    *  - REESTRUCTURAR SQL
-    *
-    * */
-
     @Autowired
     private VehiculoRepository vehiculoRepository;
+
+    @Autowired
+    private ConductorRepository conductorRepository;
 
     // ADMIN
     public List<VehiculoResponse> findAll(){
@@ -44,14 +36,22 @@ public class VehiculoService {
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
     }
 
+    // NO SE CREA AUTOMÁTICAMENTE
     public VehiculoResponse createAdmin(int idConductor, VehiculoRequest vehiculoRequest){
+        if (!conductorRepository.existsById(idConductor)){
+            throw new ConductorNotFoundException("Conductor no encontrado");
+        }
         Vehiculo vehiculo = VehiculoMapper.mapDtoToVehiculo(vehiculoRequest);
         vehiculo.setIdConductor(idConductor);
+        vehiculo.setId(0);
         vehiculoRepository.save(vehiculo);
         return VehiculoMapper.mapVehiculoToDto(vehiculo);
     }
 
     public VehiculoResponse updateAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest){
+        if (!conductorRepository.existsById(idConductor)){
+            throw new ConductorNotFoundException("Conductor no encontrado");
+        }
         if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
             throw new VehiculoNotFoundException("Vehiculo no encontrado");
         }

@@ -4,7 +4,6 @@ import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.exceptions.*;
 import com.unigo.service.ConductorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,13 +45,7 @@ public class AdminConductorController {
     // ADMIN Y USER
     @GetMapping("/searchByReputacion")
     public ResponseEntity<?> findByReputacionGreaterThanEqual(@RequestParam float mayorQue){
-        try{
-            return ResponseEntity.ok(conductorService.findByReputacionGreaterThanEqual(mayorQue));
-        }catch (ConductorException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }catch (ConductorNotFoundException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.ok(conductorService.findByReputacionGreaterThanEqual(mayorQue));
     }
 
     /*@GetMapping("/{idConductor}/vehiculos")

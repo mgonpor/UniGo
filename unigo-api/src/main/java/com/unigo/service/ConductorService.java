@@ -4,8 +4,6 @@ import com.unigo.persistence.entities.Conductor;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.service.dtos.ConductorResponse;
-import com.unigo.service.dtos.VehiculoRequest;
-import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.*;
 import com.unigo.service.mappers.ConductorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,23 +114,4 @@ public class ConductorService {
 
         return lista;
     }
-
-    // aux CRUDs Vehiculo admin
-    // create admin
-    public VehiculoResponse createVehiculoAdmin(int idConductor, VehiculoRequest vehiculoRequest){
-        if (!conductorRepository.existsById(idConductor)){
-            throw new ConductorNotFoundException("Conductor no encontrado");
-        }
-        return vehiculoService.createAdmin(idConductor, vehiculoRequest);
-    }
-
-    // update admin
-    public VehiculoResponse updateVehiculoAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest){
-        if (!conductorRepository.existsById(idConductor)){
-            throw new ConductorNotFoundException("Conductor no encontrado");
-        }
-        return vehiculoService.updateAdmin(idVehiculo, idConductor, vehiculoRequest);
-    }
-
-    // TODO: aux CRUDs Vehiculo USER (comprobaciones usuario)
 }
