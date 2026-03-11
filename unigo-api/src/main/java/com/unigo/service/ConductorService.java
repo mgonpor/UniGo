@@ -76,14 +76,14 @@ public class ConductorService {
     public ConductorResponse getMeConductor(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Conductor> c = conductorRepository.findByUsuario_Username(username);
-        if (c.isEmpty()){
+        if (c.isEmpty()) {
             throw new ConductorNotFoundException("No eres conductor aún.");
         }
         return ConductorMapper.mapConductorToDto(c.get());
     }
 
-    // Se llama desde CreateConductorAdmin y CreateVehiculoUser (en este servicio)
-    private Conductor autoCreate(int idUsuario){
+    // Se llama desde CreateVehiculoUser (en VehiculoService)
+    public Conductor autoCreate(int idUsuario){
         if(!usuarioRepository.existsById(idUsuario)){
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
