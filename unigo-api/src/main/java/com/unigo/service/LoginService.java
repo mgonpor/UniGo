@@ -3,6 +3,7 @@ package com.unigo.service;
 import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
+import com.unigo.service.dtos.RegisterRequest;
 import com.unigo.web.config.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,8 @@ public class LoginService {
     private JwtUtils jwtUtil;
 
 
-    public String registrar(LoginRequest request) {
-        this.usuarioService.create(request.getUsername(), request.getPassword());
+    public String registrar(RegisterRequest request) {
+        this.usuarioService.create(request);
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
