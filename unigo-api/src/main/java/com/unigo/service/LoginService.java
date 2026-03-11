@@ -1,5 +1,6 @@
 package com.unigo.service;
 
+import com.unigo.persistence.entities.Usuario;
 import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
@@ -26,13 +27,17 @@ public class LoginService {
     @Autowired
     private JwtUtils jwtUtil;
 
+    @Autowired  //Para crear pasajero automáticamente
+    private PasajeroService pasajeroService;
 
     public String registrar(RegisterRequest request) {
-        this.usuarioService.create(request);
+        Usuario u = this.usuarioService.create(request);
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtil.generateAccessToken(userDetails);
+
+        this.pasajeroService.autoCreate(u.getId());
 
         return token;
     }
