@@ -4,4 +4,7 @@ import com.unigo.persistence.entities.Viaje;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
+
+    boolean existsByIdAndIdConductor(int id, int idConductor);
+
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -47,10 +48,10 @@ public class Viaje {
     private EstadoViaje estadoViaje;
 
     @OneToMany(mappedBy = "viaje")
-    private List<Reserva> reservas;
+    private List<Reserva> reservas = new ArrayList<>();
 
     @OneToMany(mappedBy = "viaje")
     @JsonIgnore
-    private List<Mensaje> mensajes;
+    private List<Mensaje> mensajes = new ArrayList<>();
 
 }
