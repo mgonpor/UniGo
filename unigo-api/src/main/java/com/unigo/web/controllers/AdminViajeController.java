@@ -41,4 +41,15 @@ public class AdminViajeController {
     public ResponseEntity<?> delete(@PathVariable int id) {
         return ResponseEntity.ok(viajeService.deleteAdmin(id));
     }
+
+    @GetMapping("/estado")
+    public ResponseEntity<?> buscarPorEstado(@RequestParam String estado){
+        return ResponseEntity.ok(viajeService.searchByEstado(estado));
+    }
+
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<?> cambiarEstado(@PathVariable int id, @RequestParam String estado){
+        return ResponseEntity.ok(viajeService.cambiarEstadoAdmin(id, estado));
+    }
+
 }
