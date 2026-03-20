@@ -3,7 +3,8 @@ package com.unigo.web.controllers;
 import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
-import com.unigo.service.services.LoginService;
+import com.unigo.service.LoginService;
+import com.unigo.service.dtos.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, this.loginService.registrar(request)).build();
     }
 

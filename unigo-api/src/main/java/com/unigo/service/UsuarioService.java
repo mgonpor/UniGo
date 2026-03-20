@@ -1,7 +1,8 @@
-package com.unigo.service.services;
+package com.unigo.service;
 
 import com.unigo.persistence.entities.Usuario;
 import com.unigo.persistence.repositories.UsuarioRepository;
+import com.unigo.service.dtos.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,10 +29,12 @@ public class UsuarioService implements UserDetailsService {
                 .build();
     }
 
-    public Usuario create(String username, String password) {
+    public Usuario create(RegisterRequest request) {
         Usuario usuario = new Usuario();
-        usuario.setUsername(username);
-        usuario.setPassword(new BCryptPasswordEncoder().encode(password));
+        usuario.setNombre(request.getNombre());
+        usuario.setUsername(request.getUsername());
+        usuario.setEmail(request.getEmail());
+        usuario.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
         usuario.setRol("USER");
         return usuarioRepository.save(usuario);
     }

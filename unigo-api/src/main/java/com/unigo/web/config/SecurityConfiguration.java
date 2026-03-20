@@ -41,8 +41,17 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/*").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/admin/*").hasAnyRole("ADMIN")
+                        .requestMatchers("/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/user/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/user/**").hasAnyRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/admin/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

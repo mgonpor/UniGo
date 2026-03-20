@@ -15,4 +15,8 @@ public interface ConductorRepository extends JpaRepository<Conductor,Integer> {
     List<Conductor> findByReputacionGreaterThanEqual(float reputacion);
 
     Optional<Conductor> findByIdUsuario(int idUsuario);
+
+    void deleteByIdUsuario(int idUsuario);
+
+    Optional<Conductor> findByUsuario_Username(String usuarioUsername);
 }

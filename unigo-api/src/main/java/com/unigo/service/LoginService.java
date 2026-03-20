@@ -1,8 +1,10 @@
-package com.unigo.service.services;
+package com.unigo.service;
 
+import com.unigo.persistence.entities.Usuario;
 import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
+import com.unigo.service.dtos.RegisterRequest;
 import com.unigo.web.config.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +27,17 @@ public class LoginService {
     @Autowired
     private JwtUtils jwtUtil;
 
+    @Autowired  //Para crear pasajero automáticamente
+    private PasajeroService pasajeroService;
 
-    public String registrar(LoginRequest request) {
-        this.usuarioService.create(request.getUsername(), request.getPassword());
+    public String registrar(RegisterRequest request) {
+        Usuario u = this.usuarioService.create(request);
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtil.generateAccessToken(userDetails);
+
+        this.pasajeroService.autoCreate(u.getId());
 
         return token;
     }
