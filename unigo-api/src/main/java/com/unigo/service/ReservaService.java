@@ -1,0 +1,121 @@
+package com.unigo.service;
+
+import com.unigo.persistence.entities.Reserva;
+import com.unigo.persistence.entities.Usuario;
+import com.unigo.persistence.entities.enums.EstadoReserva;
+import com.unigo.persistence.entities.enums.EstadoViaje;
+import com.unigo.persistence.repositories.PasajeroRepository;
+import com.unigo.persistence.repositories.ReservaRepository;
+import com.unigo.persistence.repositories.UsuarioRepository;
+import com.unigo.persistence.repositories.ViajeRepository;
+import com.unigo.service.dtos.ReservaRequest;
+import com.unigo.service.dtos.ReservaResponse;
+import com.unigo.service.exceptions.*;
+import com.unigo.service.mappers.ReservaMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ReservaService {
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private PasajeroRepository pasajeroRepository;
+
+    @Autowired
+    private ViajeRepository viajeRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // ADMIN
+    public List<ReservaResponse> findAll(){
+        return reservaRepository.findAll().stream()
+                .map(ReservaMapper::mapReservaToDto)
+                .toList();
+    }
+
+    public ReservaResponse findById(int id){
+        if(!reservaRepository.existsById(id)){
+            throw new ReservaNotFoundException("Reserva con id " + id + " no encontrada");
+        }
+        return ReservaMapper.mapReservaToDto(reservaRepository.findById(id).get());
+    }
+
+    public ReservaResponse createAdmin(int idPasajero, int idViaje){
+        if(!pasajeroRepository.existsById(idPasajero)){
+            throw new PasajeroNotFoundException("Pasajero " + idPasajero + " no encontrado");
+        }
+        if(!viajeRepository.existsById(idViaje)){
+            throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
+        }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
+            throw new ViajeException("Viaje no disponible");
+        }
+        Reserva r = new Reserva();
+        r.setId(0);
+        r.setIdViaje(idViaje);
+        r.setIdPasajero(idPasajero);
+        r.setFechaReserva(LocalDate.now());
+        r.setEstadoReserva(EstadoReserva.PENDIENTE);
+        r.setValoracionNumerica(-1);
+        r.setValoracionTexto("");
+        reservaRepository.save(r);
+        return ReservaMapper.mapReservaToDto(r);
+    }
+
+    public ReservaResponse updateAdmin(int idReserva, int idPasajero, int idViaje, ReservaRequest request){
+        if(idReserva != request.getId()){
+            throw new ReservaException("El id del path y el body de la reserva no coinciden");
+        }
+        if(idPasajero != request.getIdPasajero()){
+            throw new ReservaException("El id del path y el body de pasajero no coinciden");
+        }
+        if(!reservaRepository.existsById(idReserva)){
+            throw new ReservaNotFoundException("La reserva indicada no existe");
+        }
+        if(!pasajeroRepository.existsById(idPasajero)){
+            throw new PasajeroNotFoundException("Pasajero " + idPasajero + " no encontrado");
+        }
+        if(!viajeRepository.existsById(idViaje)){
+            throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
+        }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
+            throw new ViajeException("Viaje no disponible");
+        }
+        EstadoReserva e;
+        try {
+            e = EstadoReserva.valueOf(request.getEstadoReserva().trim().toUpperCase());
+        }catch (IllegalArgumentException ex){
+            throw new ReservaException("El string enviado no coincide con ningún estado posible");
+        }
+        Reserva r = ReservaMapper.mapDtoToReserva(request);
+        r.setIdViaje(idViaje);
+        r.setEstadoReserva(e);
+        reservaRepository.save(r);
+        return ReservaMapper.mapReservaToDto(r);
+    }
+
+    public String deleteAdmin(int id) {
+        if(!reservaRepository.existsById(id)){
+            throw new ReservaNotFoundException("Reserva con id " + id + " no encontrada");
+        }
+        reservaRepository.deleteById(id);
+        return "Reserva " + id + " eliminada con éxito.";
+    }
+
+    // AUX
+    private Usuario getCurrentUsuario(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Usuario> u = usuarioRepository.findByUsername(username);
+        if (u.isEmpty()){
+            throw new ConductorNotFoundException("No eres usuario.");
+        }
+        return u.get();
+    }
+}
