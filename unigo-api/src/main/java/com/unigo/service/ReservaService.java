@@ -1,5 +1,6 @@
 package com.unigo.service;
 
+import com.unigo.persistence.entities.Pasajero;
 import com.unigo.persistence.entities.Reserva;
 import com.unigo.persistence.entities.Usuario;
 import com.unigo.persistence.entities.enums.EstadoReserva;
@@ -106,6 +107,48 @@ public class ReservaService {
             throw new ReservaNotFoundException("Reserva con id " + id + " no encontrada");
         }
         reservaRepository.deleteById(id);
+        return "Reserva " + id + " eliminada con éxito.";
+    }
+
+    // USER
+    public List<ReservaResponse> getMisReservas(){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new ConductorNotFoundException("No eres pasajero.");
+        }
+        return reservaRepository.findAllByIdPasajero(p.get().getId()).stream()
+                .map(ReservaMapper::mapReservaToDto)
+                .toList();
+    }
+
+    public ReservaResponse getMiReservaById(int id){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new ConductorNotFoundException("No eres pasajero.");
+        }
+        if(!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())){
+            throw new ReservaNotFoundException("Reserva no encontrada");
+        }
+        return ReservaMapper.mapReservaToDto(reservaRepository.findByIdAndIdPasajero(id, p.get().getId()).get());
+    }
+
+    public ReservaResponse createReserva(int idViaje){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new ConductorNotFoundException("No eres pasajero.");
+        }
+        return this.createAdmin(p.get().getId(), idViaje);
+    }
+    // NO UPDATE
+    public String deleteReserva(int id){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new ConductorNotFoundException("No eres pasajero.");
+        }
+        if(!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())){
+            throw new ReservaNotFoundException("Reserva no encontrada");
+        }
+        this.reservaRepository.deleteById(id);  // todo: ver como afecta a la lista en Viaje
         return "Reserva " + id + " eliminada con éxito.";
     }
 
