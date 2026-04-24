@@ -3,6 +3,7 @@ package com.unigo.service;
 import com.unigo.persistence.entities.Pasajero;
 import com.unigo.persistence.entities.Reserva;
 import com.unigo.persistence.entities.Usuario;
+import com.unigo.persistence.entities.Viaje;
 import com.unigo.persistence.entities.enums.EstadoReserva;
 import com.unigo.persistence.entities.enums.EstadoViaje;
 import com.unigo.persistence.repositories.PasajeroRepository;
@@ -59,6 +60,13 @@ public class ReservaService {
         }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
             throw new ViajeException("Viaje no disponible");
         }
+        Viaje v = viajeRepository.findById(idViaje).get();
+        if(v.getPlazasDisponibles() < 1){
+            throw new ViajeException("No hay plazas disponibles");
+        }else{
+            v.setPlazasDisponibles(v.getPlazasDisponibles()-1);
+            viajeRepository.save(v);
+        }
         Reserva r = new Reserva();
         r.setId(0);
         r.setIdViaje(idViaje);
@@ -106,6 +114,9 @@ public class ReservaService {
         if(!reservaRepository.existsById(id)){
             throw new ReservaNotFoundException("Reserva con id " + id + " no encontrada");
         }
+        Reserva r = reservaRepository.findById(id).get();
+        Viaje v = viajeRepository.findById(r.getIdViaje()).get();
+        v.setPlazasDisponibles(v.getPlazasDisponibles()+1);
         reservaRepository.deleteById(id);
         return "Reserva " + id + " eliminada con éxito.";
     }
@@ -137,6 +148,18 @@ public class ReservaService {
         if (p.isEmpty()){
             throw new ConductorNotFoundException("No eres pasajero.");
         }
+        if(!viajeRepository.existsById(idViaje)){
+            throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
+        }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
+            throw new ViajeException("Viaje no disponible");
+        }
+        Viaje v = viajeRepository.findById(idViaje).get();
+        if(v.getPlazasDisponibles() < 1){
+            throw new ViajeException("No hay plazas disponibles");
+        }else{
+            v.setPlazasDisponibles(v.getPlazasDisponibles()-1);
+            viajeRepository.save(v);
+        }
         return this.createAdmin(p.get().getId(), idViaje);
     }
     // NO UPDATE
@@ -148,6 +171,10 @@ public class ReservaService {
         if(!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())){
             throw new ReservaNotFoundException("Reserva no encontrada");
         }
+        Reserva r = reservaRepository.findByIdAndIdPasajero(id, p.get().getId()).get();
+        Viaje v = viajeRepository.findById(r.getIdViaje()).get();
+        v.setPlazasDisponibles(v.getPlazasDisponibles()+1);
+        viajeRepository.save(v);
         this.reservaRepository.deleteById(id);  // todo: ver como afecta a la lista en Viaje
         return "Reserva " + id + " eliminada con éxito.";
     }

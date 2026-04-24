@@ -200,6 +200,24 @@ public class ViajeService {
                 .toList();
     }
 
+    // Interceptor mensajeria
+    public boolean puedeAccederAlChat(int idUsuario, int idViaje) {
+        Viaje viaje = viajeRepository.findById(idViaje)
+                .orElseThrow(() -> new ViajeNotFoundException("Viaje no encontrado"));
+
+        // 1. ¿Es el conductor?
+        if (viaje.getConductor().getId() == idUsuario) {
+            return true;
+        }
+
+        // 2. ¿Es un pasajero con reserva confirmada?
+        return viaje.getReservas().stream()
+                .anyMatch(reserva ->
+                        reserva.getPasajero().getId() == idUsuario &&
+                                "CONFIRMADA".equalsIgnoreCase(String.valueOf(reserva.getEstadoReserva()))
+                );
+    }
+
     // AUX
     private Usuario getCurrentUsuario(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

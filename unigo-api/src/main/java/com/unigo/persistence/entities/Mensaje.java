@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mensaje")
@@ -25,12 +25,12 @@ public class Mensaje {
     @JoinColumn(name = "id_remitente", referencedColumnName = "id", insertable = false, updatable = false)
     private Usuario remitente;
 
-    @Column(name = "id_destinatario")
-    private int idDestinatario;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_destinatario", referencedColumnName = "id", insertable = false, updatable = false)
-    private Usuario destinatario;
+//    @Column(name = "id_destinatario")
+//    private int idDestinatario;
+//
+//    @ManyToOne(optional = false)
+//    @JoinColumn(name = "id_destinatario", referencedColumnName = "id", insertable = false, updatable = false)
+//    private Usuario destinatario;
 
     @Column(name = "id_viaje")
     private int idViaje;
@@ -43,6 +43,6 @@ public class Mensaje {
     private String texto;
 
     @Column(name = "fecha_envio",  nullable = false)
-    private LocalDate fechaEnvio;
+    private LocalDateTime fechaEnvio;
 
 }
