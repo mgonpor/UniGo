@@ -65,10 +65,10 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Divide la cadena por comas y elimina espacios en blanco
-        List<String> allowedOrigins = Arrays.stream(frontendUrls.split(","))
+        /*List<String> allowedOrigins = Arrays.stream(frontendUrls.split(","))
                 .map(String::trim)
-                .toList();
-//        List<String> allowedOrigins = Arrays.asList("http://localhost:4200");
+                .toList(); */
+        List<String> allowedOrigins = Arrays.asList("http://localhost:4200");
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
