@@ -35,7 +35,7 @@ public class Usuario {
     @JsonIgnore
     private List<Mensaje> enviados;
 
-    @OneToMany(mappedBy = "destinatario")
-    @JsonIgnore
-    private List<Mensaje> recibidos;
+//    @OneToMany(mappedBy = "destinatario")
+//    @JsonIgnore
+//    private List<Mensaje> recibidos;
 }
