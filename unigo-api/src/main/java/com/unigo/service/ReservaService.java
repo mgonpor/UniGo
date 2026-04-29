@@ -179,6 +179,27 @@ public class ReservaService {
         return "Reserva " + id + " eliminada con éxito.";
     }
 
+    // todo: Poner Valoraciones (post viaje)
+
+    // Aux ViajeService
+    public void confirmarReservaDesdeViaje(int id){
+        if (!reservaRepository.existsById(id)){
+            throw new ReservaNotFoundException("La reserva no existe en base de datos, pero si en viaje. INTEGRATION ERROR");
+        }
+        Reserva r = reservaRepository.findById(id).get();
+        r.setEstadoReserva(EstadoReserva.CONFIRMADA);
+        reservaRepository.save(r);
+    }
+
+    public void cancelarReservaDesdeViaje(int id){
+        if (!reservaRepository.existsById(id)){
+            throw new ReservaNotFoundException("La reserva no existe en base de datos, pero si en viaje. INTEGRATION ERROR");
+        }
+        Reserva r = reservaRepository.findById(id).get();
+        r.setEstadoReserva(EstadoReserva.CANCELADA);
+        reservaRepository.save(r);
+    }
+
     // AUX
     private Usuario getCurrentUsuario(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

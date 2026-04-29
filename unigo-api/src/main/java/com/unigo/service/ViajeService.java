@@ -1,8 +1,10 @@
 package com.unigo.service;
 
 import com.unigo.persistence.entities.Conductor;
+import com.unigo.persistence.entities.Reserva;
 import com.unigo.persistence.entities.Usuario;
 import com.unigo.persistence.entities.Viaje;
+import com.unigo.persistence.entities.enums.EstadoReserva;
 import com.unigo.persistence.entities.enums.EstadoViaje;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
@@ -33,6 +35,9 @@ public class ViajeService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ReservaService reservaService;
 
     // ADMIN
     public List<ViajeResponse> findAll() {
@@ -191,6 +196,64 @@ public class ViajeService {
         viajeRepository.deleteById(id);
         return "Viaje " + id + " eliminado con exito";
     }
+
+    public ViajeResponse cambiarEstadoUser(int id, String estado){
+        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (c.isEmpty()){
+            throw new ConductorNotFoundException("Aún no eres conductor.");
+        }
+        if(!viajeRepository.existsByIdAndIdConductor(id, c.get().getId())){
+            throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + id);
+        }
+        estado = estado.trim().toUpperCase();
+        EstadoViaje e;
+        try {
+            e = EstadoViaje.valueOf(estado);
+        }catch (IllegalArgumentException ex){
+            throw new ViajeException("El string enviado no coincide con ningún estado posible");
+        }
+        Viaje vDB = viajeRepository.findById(id).get();
+        vDB.setEstadoViaje(e);
+        viajeRepository.save(vDB);
+        return ViajeMapper.mapViajeToDto(vDB);
+    }
+
+    public ViajeResponse confimarReserva(int idViaje, int idReserva){
+        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (c.isEmpty()){
+            throw new ConductorNotFoundException("Aún no eres conductor.");
+        }
+        if(!viajeRepository.existsByIdAndIdConductor(idViaje, c.get().getId())){
+            throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + idViaje);
+        }
+        Viaje vDB = viajeRepository.findById(idViaje).get();
+        if(! vDB.getReservas().stream().filter(r -> r.getId() == idReserva && r.getEstadoReserva().equals(EstadoReserva.PENDIENTE)).toList().isEmpty()){
+            reservaService.confirmarReservaDesdeViaje(idReserva);
+        }else {
+            throw new ViajeException("Reserva no existente o ya confirmada");
+        }
+        viajeRepository.save(vDB);
+        return ViajeMapper.mapViajeToDto(viajeRepository.findById(idViaje).get());
+    }
+
+    public ViajeResponse cancelarReserva(int idViaje, int idReserva){
+        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (c.isEmpty()){
+            throw new ConductorNotFoundException("Aún no eres conductor.");
+        }
+        if(!viajeRepository.existsByIdAndIdConductor(idViaje, c.get().getId())){
+            throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + idViaje);
+        }
+        Viaje vDB = viajeRepository.findById(idViaje).get();
+        if(! vDB.getReservas().stream().filter(r -> r.getId() == idReserva).toList().isEmpty()){
+            reservaService.cancelarReservaDesdeViaje(idReserva);
+        }else {
+            throw new ViajeException("Reserva no existente.");
+        }
+        viajeRepository.save(vDB);
+        return ViajeMapper.mapViajeToDto(viajeRepository.findById(idViaje).get());
+    }
+
 
     // PASAJERO (tmb USER)
     // todo: filtrado origen y destino
