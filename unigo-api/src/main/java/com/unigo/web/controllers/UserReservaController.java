@@ -32,4 +32,10 @@ public class UserReservaController {
         return ResponseEntity.ok(reservaService.deleteReserva(id));
     }
 
+    @PutMapping("/{id}/valorar")
+    public ResponseEntity<?> ponerValoraciones(@PathVariable int id, @RequestParam int idViaje,
+                                               @RequestParam int valNum, @RequestParam String valText) {
+        return ResponseEntity.ok(reservaService.ponerValoraciones(idViaje, id, valNum, valText));
+    }
+
 }
