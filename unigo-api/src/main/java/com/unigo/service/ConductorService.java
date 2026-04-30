@@ -92,7 +92,8 @@ public class ConductorService {
         }
         Conductor c = new Conductor();
         c.setIdUsuario(idUsuario);
-        c.setReputacion(0);
+        c.setReputacion(-1); // Esto va a significar "Sin valoraciones"
+        c.setNumValoraciones(0);
         return conductorRepository.save(c);
     }
 

@@ -1,15 +1,9 @@
 package com.unigo.service;
 
-import com.unigo.persistence.entities.Pasajero;
-import com.unigo.persistence.entities.Reserva;
-import com.unigo.persistence.entities.Usuario;
-import com.unigo.persistence.entities.Viaje;
+import com.unigo.persistence.entities.*;
 import com.unigo.persistence.entities.enums.EstadoReserva;
 import com.unigo.persistence.entities.enums.EstadoViaje;
-import com.unigo.persistence.repositories.PasajeroRepository;
-import com.unigo.persistence.repositories.ReservaRepository;
-import com.unigo.persistence.repositories.UsuarioRepository;
-import com.unigo.persistence.repositories.ViajeRepository;
+import com.unigo.persistence.repositories.*;
 import com.unigo.service.dtos.ReservaRequest;
 import com.unigo.service.dtos.ReservaResponse;
 import com.unigo.service.exceptions.*;
@@ -20,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,6 +31,9 @@ public class ReservaService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ConductorRepository conductorRepository;
 
     // ADMIN
     public List<ReservaResponse> findAll(){
@@ -179,12 +177,42 @@ public class ReservaService {
         return "Reserva " + id + " eliminada con éxito.";
     }
 
-    // todo: Poner Valoraciones (post viaje)
+    public ReservaResponse ponerValoraciones(int idViaje, int idReserva, int valNum, String valText){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new ConductorNotFoundException("No eres pasajero.");
+        }
+        if(!reservaRepository.existsByIdAndIdPasajero(idReserva, p.get().getId())){
+            throw new ReservaNotFoundException("Reserva no encontrada");
+        }
+        if(! reservaRepository.existsByIdAndIdViaje(idReserva, idViaje)){
+            throw new ReservaNotFoundException("Reserva y viaje no relacionados");
+        }
+        if (viajeRepository.findById(idViaje).get().getFechaSalida().isBefore(LocalDate.now())){
+            throw new ViajeException("El viaje aún no ha iniciado");
+        }
+        Reserva rDB = reservaRepository.findByIdAndIdViaje(idReserva, idViaje).get();
+        if(0 < valNum && valNum <= 5) {
+            // Lógica actualizar Conductor
+            Optional<Conductor> optC = conductorRepository.findById(viajeRepository.findById(idViaje).get().getIdConductor());
+            if (optC.isEmpty()){
+                throw new ConductorNotFoundException("No conductor del viaje no encontrado");
+            }
+            Conductor cDB = optC.get();
+            cDB.setReputacion(
+                    (float) (cDB.getReputacion() +  (valNum - cDB.getReputacion()) / (cDB.getNumValoraciones()+1.0) )
+            );
+            cDB.setNumValoraciones(cDB.getNumValoraciones()+1);
+            rDB.setValoracionNumerica(valNum);
+            rDB.setValoracionTexto(Objects.requireNonNullElse(valText, ""));
+        }
+        return ReservaMapper.mapReservaToDto(reservaRepository.save(rDB));
+    }
 
     // Aux ViajeService
     public void confirmarReservaDesdeViaje(int id){
         if (!reservaRepository.existsById(id)){
-            throw new ReservaNotFoundException("La reserva no existe en base de datos, pero si en viaje. INTEGRATION ERROR");
+            throw new ReservaNotFoundException("La reserva no existe en su tabla, pero si en viaje. INTEGRATION ERROR");
         }
         Reserva r = reservaRepository.findById(id).get();
         r.setEstadoReserva(EstadoReserva.CONFIRMADA);

@@ -17,5 +17,6 @@ public class ConductorResponse {
     private String username;
     private List<VehiculoResponse> vehiculos;
     private Float reputacion;
+    private Integer numValoraciones;
 
 }

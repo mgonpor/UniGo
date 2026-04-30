@@ -12,4 +12,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     Optional<Reserva> findByIdAndIdPasajero(int id, int idPasajero);
 
     boolean existsByIdAndIdPasajero(int id, int id1);
+
+    Optional<Reserva> findByIdAndIdViaje(int id, int idViaje);
+
+    boolean existsByIdAndIdViaje(int id, int idViaje);
 }
