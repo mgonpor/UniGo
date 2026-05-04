@@ -22,6 +22,11 @@ public class UserReservaController {
         return ResponseEntity.ok(reservaService.getMiReservaById(id));
     }
 
+    @GetMapping("/estado")
+    public ResponseEntity<?> getMisReservasByEstado(@RequestParam String estado) {
+        return ResponseEntity.ok(reservaService.getMisReservasByEstado(estado));
+    }
+
     @PostMapping
     public ResponseEntity<?> crearReserva(@RequestParam int idViaje){
         return ResponseEntity.ok(reservaService.createReserva(idViaje));

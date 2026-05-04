@@ -141,6 +141,23 @@ public class ReservaService {
         return ReservaMapper.mapReservaToDto(reservaRepository.findByIdAndIdPasajero(id, p.get().getId()).get());
     }
 
+    public List<ReservaResponse> getMisReservasByEstado(String estado){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new ConductorNotFoundException("No eres pasajero.");
+        }
+        estado = estado.trim().toUpperCase();
+        EstadoReserva e;
+        try {
+            e = EstadoReserva.valueOf(estado);
+        }catch (IllegalArgumentException ex){
+            throw new ViajeException("El string enviado no coincide con ningún estado posible");
+        }
+        return reservaRepository.findAllByIdPasajeroAndEstadoReserva(p.get().getId(), e).stream()
+                .map(ReservaMapper::mapReservaToDto)
+                .toList();
+    }
+
     public ReservaResponse createReserva(int idViaje){
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
         if (p.isEmpty()){
@@ -226,6 +243,12 @@ public class ReservaService {
         Reserva r = reservaRepository.findById(id).get();
         r.setEstadoReserva(EstadoReserva.CANCELADA);
         reservaRepository.save(r);
+    }
+
+    public List<Integer> getHistoricoViajesHechos(int idPasajero){
+        return reservaRepository.findAllByIdPasajeroAndEstadoReserva(idPasajero, EstadoReserva.CONFIRMADA)
+                .stream().map(Reserva::getIdViaje)
+                .toList();
     }
 
     // AUX

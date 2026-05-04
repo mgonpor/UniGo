@@ -1,6 +1,7 @@
 package com.unigo.persistence.repositories;
 
 import com.unigo.persistence.entities.Reserva;
+import com.unigo.persistence.entities.enums.EstadoReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     Optional<Reserva> findByIdAndIdViaje(int id, int idViaje);
 
     boolean existsByIdAndIdViaje(int id, int idViaje);
+
+    List<Reserva> findAllByIdPasajeroAndEstadoReserva(int idPasajero, EstadoReserva estadoReserva);
 }

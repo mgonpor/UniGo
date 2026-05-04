@@ -58,6 +58,11 @@ public class UserViajeController {
     }
 
     // PASAJERO
+    @GetMapping("/historial")
+    public ResponseEntity<?> getMisViajesPasajero(){
+        return ResponseEntity.ok(viajeService.getMisViajesPasajero());
+    }
+
     @GetMapping("/disponibles")
     public ResponseEntity<List<ViajeResponse>> viajesDisponibles(){
         return ResponseEntity.ok(viajeService.getViajesDisponibles());

@@ -116,6 +116,10 @@ public class VehiculoService {
         int idConductor = c.map(Conductor::getId).orElseGet(() -> conductorService.autoCreate(getCurrentUsuario().getId()).getId());
 
         Vehiculo v = VehiculoMapper.mapDtoToVehiculo(request);
+        String matricula = request.getMatricula().trim().toUpperCase();
+        if (!matricula.matches("^[0-9]{4}[B-DF-HJ-NP-TV-Z]{3}$")) {
+            throw new VehiculoException("La matrícula debe ser válida.");
+        }
         v.setId(0);
         v.setIdConductor(idConductor);
 

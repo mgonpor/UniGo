@@ -3,6 +3,8 @@ package com.unigo.service;
 import com.unigo.persistence.entities.Usuario;
 import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.service.dtos.RegisterRequest;
+import com.unigo.service.exceptions.UsuarioException;
+import com.unigo.service.exceptions.UsuarioNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UsuarioService implements UserDetailsService {
@@ -42,5 +46,26 @@ public class UsuarioService implements UserDetailsService {
     public Usuario findByUsername(String username) {
         return usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no se ha encontrado"));
+    }
+
+    // Acciones especiales de ADMIN
+    public String crearUsuarioComoAdmin(RegisterRequest request) {
+        try{
+            this.create(request);
+        }catch(Exception e){
+            throw new UsuarioException("No se ha podido crear el usuario.");
+        }
+        return "Usuario " +  request.getUsername() + " ha sido creado correctamente.";
+    }
+
+    public String cambiarRolUsuario(int idUsuario, String rol) {
+        Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
+         if(optU.isEmpty()){
+             throw new UsuarioNotFoundException("Usuario no encontrado");
+         }
+         Usuario usuario = optU.get();
+         usuario.setRol(rol);
+         usuarioRepository.save(usuario);
+         return "Nuevo rol: " + usuario.getRol();
     }
 }
