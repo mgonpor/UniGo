@@ -18,9 +18,9 @@ public class UserVehiculoController {
         return ResponseEntity.ok(vehiculoService.getMisVehiculos());
     }
 
-    @GetMapping("/{idVehiculo}")
-    public ResponseEntity<?> getMisVehiculos(@PathVariable int idVehiculo) {
-        return ResponseEntity.ok(vehiculoService.getVehiculoById(idVehiculo));
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMisVehiculos(@PathVariable int id) {
+        return ResponseEntity.ok(vehiculoService.getVehiculoById(id));
     }
 
     @PostMapping
@@ -28,13 +28,13 @@ public class UserVehiculoController {
         return ResponseEntity.ok(vehiculoService.createVehiculo(request));
     }
 
-    @PutMapping("/{idVehiculo}")
-    public ResponseEntity<?> updateVehiculo(@PathVariable int idVehiculo, @RequestBody VehiculoRequest request){
-        return ResponseEntity.ok(vehiculoService.updateVehiculo(idVehiculo, request));
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateVehiculo(@PathVariable int id, @RequestBody VehiculoRequest request){
+        return ResponseEntity.ok(vehiculoService.updateVehiculo(id, request));
     }
 
-    @DeleteMapping("/{idVehiculo}")
-    public ResponseEntity<?> deleteVehiculo(int idVehiculo){
-        return ResponseEntity.ok(vehiculoService.delete(idVehiculo));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteVehiculo(int id){
+        return ResponseEntity.ok(vehiculoService.delete(id));
     }
 }

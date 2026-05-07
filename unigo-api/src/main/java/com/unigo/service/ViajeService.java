@@ -165,8 +165,8 @@ public class ViajeService {
         if (request.getPrecioPorPlaza() > precioMaximo ||  request.getPrecioPorPlaza() < 0){
             throw new ViajeException("Precio no válido");
         }
+        request.setId(0);
         Viaje newViaje = ViajeMapper.mapDtoToViaje(request);
-        newViaje.setId(0);
         newViaje.setIdConductor(c.get().getId());
         newViaje.setEstadoViaje(EstadoViaje.DISPONIBLE);
         newViaje.setReservas(new ArrayList<>());

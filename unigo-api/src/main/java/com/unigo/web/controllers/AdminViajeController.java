@@ -26,8 +26,8 @@ public class AdminViajeController {
         return ResponseEntity.ok(viajeService.findById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<?> save(@RequestParam int idConductor, @RequestBody ViajeRequest viajeRequest) {
+    @PostMapping("/{idConductor}")
+    public ResponseEntity<?> save(@PathVariable int idConductor, @RequestBody ViajeRequest viajeRequest) {
         return ResponseEntity.ok(viajeService.createAdmin(idConductor, viajeRequest));
     }
 

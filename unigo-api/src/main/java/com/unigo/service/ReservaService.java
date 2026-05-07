@@ -177,8 +177,8 @@ public class ReservaService {
         }
         return this.createAdmin(p.get().getId(), idViaje);
     }
-    // NO UPDATE
-    public String deleteReserva(int id){
+    // NO UPDATE NI DELETE
+    public String candelarReservaPasajero(int id){
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
         if (p.isEmpty()){
             throw new ConductorNotFoundException("No eres pasajero.");
@@ -190,7 +190,8 @@ public class ReservaService {
         Viaje v = viajeRepository.findById(r.getIdViaje()).get();
         v.setPlazasDisponibles(v.getPlazasDisponibles()+1);
         viajeRepository.save(v);
-        this.reservaRepository.deleteById(id);  // todo: ver como afecta a la lista en Viaje
+        r.setEstadoReserva(EstadoReserva.CANCELADA);
+        this.reservaRepository.deleteById(id);
         return "Reserva " + id + " eliminada con éxito.";
     }
 

@@ -32,9 +32,9 @@ public class UserReservaController {
         return ResponseEntity.ok(reservaService.createReserva(idViaje));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteReserva(@PathVariable int id){
-        return ResponseEntity.ok(reservaService.deleteReserva(id));
+    @PutMapping("/{id}/cancelar")
+    public ResponseEntity<?> candelarReservaPasajero(@PathVariable int id){
+        return ResponseEntity.ok(reservaService.candelarReservaPasajero(id));
     }
 
     @PutMapping("/{id}/valorar")
