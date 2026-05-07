@@ -19,7 +19,7 @@ public class UserVehiculoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMisVehiculos(@PathVariable int id) {
+    public ResponseEntity<?> getMisVehiculoById(@PathVariable int id) {
         return ResponseEntity.ok(vehiculoService.getVehiculoById(id));
     }
 

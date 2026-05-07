@@ -26,8 +26,8 @@ public class AdminVehiculoController {
         return ResponseEntity.ok(vehiculoService.findById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<?> create(@RequestParam int idConductor, @RequestBody VehiculoRequest request){
+    @PostMapping("/{idConductor}")
+    public ResponseEntity<?> create(@PathVariable int idConductor, @RequestBody VehiculoRequest request){
         return ResponseEntity.ok(this.vehiculoService.createAdmin(idConductor, request));
     }
 

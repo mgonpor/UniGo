@@ -23,12 +23,12 @@ public class AdminConductorController {
     }
 
     @GetMapping("/{idUsuario}")
-    public ResponseEntity<?> getConductorById(@PathVariable int idUsuario){
+    public ResponseEntity<?> getConductorByIdUsuario(@PathVariable int idUsuario){
         return ResponseEntity.ok(conductorService.findByIdUsuario(idUsuario));
     }
 
-    @PostMapping
-    public ResponseEntity<?> createConductor(@RequestParam int idUsuario){
+    @PostMapping("/{idUsuario}")
+    public ResponseEntity<?> createConductor(@PathVariable int idUsuario){
         return ResponseEntity.ok(conductorService.create(idUsuario));
     }
 
