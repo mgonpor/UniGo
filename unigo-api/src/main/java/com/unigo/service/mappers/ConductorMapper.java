@@ -18,6 +18,7 @@ public class ConductorMapper {
         conductorResponse.setNombre(conductor.getUsuario().getNombre());
         conductorResponse.setUsername(conductor.getUsuario().getUsername());
         conductorResponse.setReputacion(conductor.getReputacion());
+        conductorResponse.setNumValoraciones(conductor.getNumValoraciones());
 
         List<VehiculoResponse> vehiculos = new ArrayList<>();
 

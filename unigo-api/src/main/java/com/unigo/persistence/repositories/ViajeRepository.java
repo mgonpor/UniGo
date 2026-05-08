@@ -18,5 +18,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
 
     List<Viaje> findByEstadoViaje(EstadoViaje estadoViaje);
 
-    List<Viaje> findByEstadoViajeAndFechaSalidaAfter(EstadoViaje estadoViaje, LocalDate fechaSalidaAfter);
+    List<Viaje> findAllByEstadoViajeAndFechaSalidaAfter(EstadoViaje estadoViaje, LocalDate fechaSalidaAfter);
+
+    List<Viaje> findAllByIdIn(List<Integer> ids);
 }

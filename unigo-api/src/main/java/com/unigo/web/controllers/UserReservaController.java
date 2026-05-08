@@ -22,14 +22,25 @@ public class UserReservaController {
         return ResponseEntity.ok(reservaService.getMiReservaById(id));
     }
 
+    @GetMapping("/estado")
+    public ResponseEntity<?> getMisReservasByEstado(@RequestParam String estado) {
+        return ResponseEntity.ok(reservaService.getMisReservasByEstado(estado));
+    }
+
     @PostMapping
     public ResponseEntity<?> crearReserva(@RequestParam int idViaje){
         return ResponseEntity.ok(reservaService.createReserva(idViaje));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteReserva(@PathVariable int id){
-        return ResponseEntity.ok(reservaService.deleteReserva(id));
+    @PutMapping("/{id}/cancelar")
+    public ResponseEntity<?> candelarReservaPasajero(@PathVariable int id){
+        return ResponseEntity.ok(reservaService.candelarReservaPasajero(id));
+    }
+
+    @PutMapping("/{id}/valorar")
+    public ResponseEntity<?> ponerValoraciones(@PathVariable int id, @RequestParam int idViaje,
+                                               @RequestParam int valNum, @RequestParam String valText) {
+        return ResponseEntity.ok(reservaService.ponerValoraciones(idViaje, id, valNum, valText));
     }
 
 }

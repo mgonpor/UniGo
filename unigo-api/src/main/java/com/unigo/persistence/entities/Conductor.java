@@ -29,6 +29,8 @@ public class Conductor {
 
     private float reputacion;
 
+    private int numValoraciones;
+
     @OneToMany(mappedBy = "conductor")
     private List<Vehiculo> vehiculos;
 

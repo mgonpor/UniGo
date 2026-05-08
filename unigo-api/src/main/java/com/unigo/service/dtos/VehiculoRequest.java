@@ -24,7 +24,7 @@ public class VehiculoRequest {
     private String color;
 
     @NotBlank(message = "Matrícula obligatoria")
-    @Size(min = 7, message = "Mínimo 8 caracteres")
+    @Size(min = 7, max = 8, message = "La matrícula debe tener 7 caracteres")
     private String matricula;
 
 }

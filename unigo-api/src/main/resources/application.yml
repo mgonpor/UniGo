@@ -36,3 +36,5 @@ jwt:
 frontend:
   url: ${FRONTEND_URLS:'http://localhost:4200'}
   #ver que puerto usará React
+
+precioMaximo: ${PRECIO_MAXIMO:20}
