@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     context-path: "/api"
 
@@ -7,34 +7,30 @@ spring:
   application:
     name: unigo
   datasource:
-    url: jdbc:mariadb://localhost:3306/unigo?createDatabaseIfNotExist=true
-    username: ${DB_USERNAME:admin}
-    password: ${DB_PASSWORD:admin}
-    driver-class-name: org.mariadb.jdbc.Driver
+    url: mariadb://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${DDL_AUTO}
+    show-sql: ${SHOW_SQL}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${FORMAT_SQL}
     database: mysql
     database-platform: org.hibernate.dialect.MariaDBDialect
   main:
     allow-bean-definition-overriding: true
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE:preprod}
 
 jwt:
-  secret: ${JWT_SECRET:'2f5626185baf25cf286a0d831255970395de10fd29122a2bed6df10ea591f382W'}
+  secret: ${JWT_SECRET}
   access:
-    expires: 3600000
+    expires: ${JWT_ACCESS_EXPIRES}
   refresh:
-    expires: 604800000
-  issuer: unigo
+    expires: ${JWT_REFRESH_EXPIRES}
+  issuer: ${JWT_ISSUER}
 
 frontend:
-  url: ${FRONTEND_URLS:'http://localhost:4200'}
-  #ver que puerto usará React
+  url: ${FRONTEND_URLS}
 
-precioMaximo: ${PRECIO_MAXIMO:20}
+precioMaximo: ${PRECIO_MAXIMO}
