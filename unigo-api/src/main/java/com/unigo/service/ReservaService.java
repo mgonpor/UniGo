@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -195,7 +196,7 @@ public class ReservaService {
         return "Reserva " + id + " eliminada con éxito.";
     }
 
-    public ReservaResponse ponerValoraciones(int idViaje, int idReserva, int valNum, String valText){
+    public ReservaResponse ponerValoraciones(int idReserva, int valNum, String valText){
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
         if (p.isEmpty()){
             throw new ConductorNotFoundException("No eres pasajero.");
@@ -203,16 +204,13 @@ public class ReservaService {
         if(!reservaRepository.existsByIdAndIdPasajero(idReserva, p.get().getId())){
             throw new ReservaNotFoundException("Reserva no encontrada");
         }
-        if(! reservaRepository.existsByIdAndIdViaje(idReserva, idViaje)){
-            throw new ReservaNotFoundException("Reserva y viaje no relacionados");
-        }
-        if (viajeRepository.findById(idViaje).get().getFechaSalida().isBefore(LocalDate.now())){
+        Reserva rDB = reservaRepository.findById(idReserva).get();
+        if (viajeRepository.findById(rDB.getId()).get().getFechaSalida().isBefore(LocalDate.now())){
             throw new ViajeException("El viaje aún no ha iniciado");
         }
-        Reserva rDB = reservaRepository.findByIdAndIdViaje(idReserva, idViaje).get();
         if(0 < valNum && valNum <= 5) {
             // Lógica actualizar Conductor
-            Optional<Conductor> optC = conductorRepository.findById(viajeRepository.findById(idViaje).get().getIdConductor());
+            Optional<Conductor> optC = conductorRepository.findById(viajeRepository.findById(rDB.getIdViaje()).get().getIdConductor());
             if (optC.isEmpty()){
                 throw new ConductorNotFoundException("No conductor del viaje no encontrado");
             }
@@ -244,6 +242,12 @@ public class ReservaService {
         Reserva r = reservaRepository.findById(id).get();
         r.setEstadoReserva(EstadoReserva.CANCELADA);
         reservaRepository.save(r);
+    }
+
+    public List<ReservaResponse> getReservasByIdViaje(int idViaje){
+        return reservaRepository.findAllByIdViaje(idViaje).stream()
+                .map(ReservaMapper::mapReservaToDto)
+                .toList();
     }
 
     public List<Integer> getHistoricoViajesHechos(int idPasajero){

@@ -7,9 +7,11 @@ import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.PasajeroRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.persistence.repositories.ViajeRepository;
+import com.unigo.service.dtos.ReservaResponse;
 import com.unigo.service.dtos.ViajeRequest;
 import com.unigo.service.dtos.ViajeResponse;
 import com.unigo.service.exceptions.ConductorNotFoundException;
+import com.unigo.service.exceptions.PasajeroNotFoundException;
 import com.unigo.service.exceptions.ViajeException;
 import com.unigo.service.exceptions.ViajeNotFoundException;
 import com.unigo.service.mappers.ViajeMapper;
@@ -266,12 +268,32 @@ public class ViajeService {
         return ViajeMapper.mapViajeToDto(viajeRepository.findById(idViaje).get());
     }
 
+    // CONDUCTOR
+    public List<ReservaResponse> getReservasByIdViaje(int idViaje){
+        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (c.isEmpty()){
+            throw new ConductorNotFoundException("No eres conductor.");
+        }
+        return reservaService.getReservasByIdViaje(idViaje);
+    }
 
     // PASAJERO (tmb USER)
+    public ViajeResponse getViajeByIdPasajero(int idViaje){
+        Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (p.isEmpty()){
+            throw new PasajeroNotFoundException("No eres pasajero.");
+        }
+        Optional<Viaje> vDB = viajeRepository.findByIdAndEstadoViajeAndFechaSalidaAfter(idViaje, EstadoViaje.DISPONIBLE, LocalDate.now());
+        if (vDB.isEmpty()){
+            throw new ViajeException("Viaje no disponible");
+        }
+        return ViajeMapper.mapViajeToDto(vDB.get());
+    }
+
     public List<ViajeResponse> getMisViajesPasajero(){
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
         if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
         return viajeRepository.findAllByIdIn(reservaService.getHistoricoViajesHechos(p.get().getId()))
                 .stream().map(ViajeMapper::mapViajeToDto)
