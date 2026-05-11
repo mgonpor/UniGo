@@ -9,8 +9,8 @@ RUN mvn dependency:go-offline -B
 # Copiamos el código fuente de la aplicación
 COPY src ./src
 
-# Empaquetamos la aplicación, saltando los tests para un despliegue más rápido en Dokploy
-RUN mvn clean package -DskipTests
+# Empaquetamos la aplicación, saltando la compilación y ejecución de tests para un despliegue más rápido
+RUN mvn clean package -Dmaven.test.skip=true
 
 # Etapa 2: Ejecución (Run stage)
 FROM eclipse-temurin:21-jre-alpine
