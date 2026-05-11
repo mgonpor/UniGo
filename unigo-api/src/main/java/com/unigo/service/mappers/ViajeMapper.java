@@ -38,8 +38,7 @@ public class ViajeMapper {
     public static Viaje mapDtoToViaje(ViajeRequest dto) {
         Viaje viaje = new Viaje();
 
-        viaje.setId(dto.getId());
-        // sin id conductor
+        // sin id ni id conductor
         viaje.setOrigen(dto.getOrigen());
         viaje.setDestino(dto.getDestino());
         viaje.setFechaSalida(dto.getFechaSalida());

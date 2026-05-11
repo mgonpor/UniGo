@@ -31,10 +31,10 @@ public class PasajeroService {
     }
 
     public PasajeroResponse createPasajero(int idUsuario) {
-        if(!usuarioRepository.existsById(idUsuario)){
+        if (!usuarioRepository.existsById(idUsuario)) {
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
-        if(pasajeroRepository.existsByIdUsuario(idUsuario)){
+        if (pasajeroRepository.existsByIdUsuario(idUsuario)) {
             throw new DuplicateResourceException("Pasajero ya existente");
         }
         Pasajero p = new Pasajero();
@@ -44,27 +44,29 @@ public class PasajeroService {
     }
 
     // USER Y ADMIN
-    public PasajeroResponse getPasajeroByIdUsuario(int idUsuario){
-        if(!usuarioRepository.existsById(idUsuario)){
+    public PasajeroResponse getPasajeroByIdUsuario(int idUsuario) {
+        if (!usuarioRepository.existsById(idUsuario)) {
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
         Optional<Pasajero> p = this.pasajeroRepository.findByIdUsuario(idUsuario);
-        if(p.isEmpty()){
+        if (p.isEmpty()) {
             throw new PasajeroNotFoundException("El id de usuario no corresponde a ningún pasajero.");
         }
         return PasajeroMapper.mapPasajeroToDto(p.get());
     }
 
     // NO ENDPOINT, se llama desde AuthService.register()
-    public void autoCreate(int idUsuario) {
-        if(!usuarioRepository.existsById(idUsuario)){
+    public PasajeroResponse autoCreate(int idUsuario) {
+        if (!usuarioRepository.existsById(idUsuario)) {
             throw new UsuarioNotFoundException("No se ha encontrado el usuario con id " + idUsuario);
         }
-        if(pasajeroRepository.existsByIdUsuario(idUsuario)){
+        if (pasajeroRepository.existsByIdUsuario(idUsuario)) {
             throw new DuplicateResourceException("Pasajero ya existente");
         }
         Pasajero p = new Pasajero();
         p.setIdUsuario(idUsuario);
         pasajeroRepository.save(p);
+        // para los test
+        return PasajeroMapper.mapPasajeroToDto(p);
     }
 }

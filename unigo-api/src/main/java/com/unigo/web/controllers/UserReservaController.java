@@ -34,13 +34,13 @@ public class UserReservaController {
 
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<?> candelarReservaPasajero(@PathVariable int id){
-        return ResponseEntity.ok(reservaService.candelarReservaPasajero(id));
+        return ResponseEntity.ok(reservaService.cancelarReservaPasajero(id));
     }
 
     @PutMapping("/{id}/valorar")
-    public ResponseEntity<?> ponerValoraciones(@PathVariable int id, @RequestParam int idViaje,
-                                               @RequestParam int valNum, @RequestParam String valText) {
-        return ResponseEntity.ok(reservaService.ponerValoraciones(idViaje, id, valNum, valText));
+    public ResponseEntity<?> ponerValoraciones(@PathVariable int id,@RequestParam int valNum,
+                                               @RequestParam String valText) {
+        return ResponseEntity.ok(reservaService.ponerValoraciones(id, valNum, valText));
     }
 
 }

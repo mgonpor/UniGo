@@ -6,10 +6,10 @@ import com.unigo.persistence.entities.Vehiculo;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.persistence.repositories.VehiculoRepository;
-import com.unigo.service.dtos.ConductorResponse;
 import com.unigo.service.dtos.VehiculoRequest;
 import com.unigo.service.dtos.VehiculoResponse;
 import com.unigo.service.exceptions.ConductorNotFoundException;
+import com.unigo.service.exceptions.UsuarioNotFoundException;
 import com.unigo.service.exceptions.VehiculoException;
 import com.unigo.service.exceptions.VehiculoNotFoundException;
 import com.unigo.service.mappers.VehiculoMapper;
@@ -36,22 +36,22 @@ public class VehiculoService {
     private ConductorService conductorService;
 
     // ADMIN
-    public List<VehiculoResponse> findAll(){
+    public List<VehiculoResponse> findAll() {
         return vehiculoRepository.findAll().stream()
                 .map(VehiculoMapper::mapVehiculoToDto)
                 .toList();
     }
 
-    public VehiculoResponse findById(int idVehiculo){
-        if (!vehiculoRepository.existsById(idVehiculo)){
+    public VehiculoResponse findById(int idVehiculo) {
+        if (!vehiculoRepository.existsById(idVehiculo)) {
             throw new VehiculoNotFoundException("Vehiculo no encontrado");
         }
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
     }
 
     // NO SE CREA AUTOMÁTICAMENTE
-    public VehiculoResponse createAdmin(int idConductor, VehiculoRequest vehiculoRequest){
-        if (!conductorRepository.existsById(idConductor)){
+    public VehiculoResponse createAdmin(int idConductor, VehiculoRequest vehiculoRequest) {
+        if (!conductorRepository.existsById(idConductor)) {
             throw new ConductorNotFoundException("Conductor no encontrado");
         }
         Vehiculo vehiculo = VehiculoMapper.mapDtoToVehiculo(vehiculoRequest);
@@ -61,14 +61,14 @@ public class VehiculoService {
         return VehiculoMapper.mapVehiculoToDto(vehiculo);
     }
 
-    public VehiculoResponse updateAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest){
-        if (!conductorRepository.existsById(idConductor)){
+    public VehiculoResponse updateAdmin(int idVehiculo, int idConductor, VehiculoRequest vehiculoRequest) {
+        if (!conductorRepository.existsById(idConductor)) {
             throw new ConductorNotFoundException("Conductor no encontrado");
         }
-        if (idVehiculo != vehiculoRequest.getId()){
+        if (idVehiculo != vehiculoRequest.getId()) {
             throw new VehiculoException("El id del path y el body no coinciden.");
         }
-        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
+        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)) {
             throw new VehiculoNotFoundException("Vehiculo no encontrado");
         }
         Vehiculo vDB = this.vehiculoRepository.findById(idVehiculo).get();
@@ -80,18 +80,18 @@ public class VehiculoService {
         return VehiculoMapper.mapVehiculoToDto(vDB);
     }
 
-    public String deleteAdmin(int idVehiculo){
-        if (!vehiculoRepository.existsById(idVehiculo)){
+    public String deleteAdmin(int idVehiculo) {
+        if (!vehiculoRepository.existsById(idVehiculo)) {
             throw new VehiculoNotFoundException("Vehiculo no encontrado");
         }
         this.vehiculoRepository.deleteById(idVehiculo);
         return "Vehiculo " + idVehiculo + " eliminado";
     }
 
-    //  CRUDs USER
+    // CRUDs USER
     public List<VehiculoResponse> getMisVehiculos() {
         Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (c.isEmpty()){
+        if (c.isEmpty()) {
             throw new ConductorNotFoundException("Aún no eres conductor.");
         }
         return vehiculoRepository.findAllByIdConductor(c.get().getId()).stream()
@@ -100,20 +100,21 @@ public class VehiculoService {
     }
 
     // Get by id
-    public VehiculoResponse getVehiculoById(int idVehiculo){
+    public VehiculoResponse getVehiculoById(int idVehiculo) {
         Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (c.isEmpty()){
+        if (c.isEmpty()) {
             throw new ConductorNotFoundException("Aún no eres conductor.");
         }
-        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, c.get().getId())){
+        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, c.get().getId())) {
             throw new VehiculoNotFoundException("No tiene un vehículo con dicho id");
         }
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.findById(idVehiculo).get());
     }
 
-    public VehiculoResponse createVehiculo(VehiculoRequest request){
+    public VehiculoResponse createVehiculo(VehiculoRequest request) {
         Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        int idConductor = c.map(Conductor::getId).orElseGet(() -> conductorService.autoCreate(getCurrentUsuario().getId()).getId());
+        int idConductor = c.map(Conductor::getId)
+                .orElseGet(() -> conductorService.autoCreate(getCurrentUsuario().getId()).getId());
 
         Vehiculo v = VehiculoMapper.mapDtoToVehiculo(request);
         String matricula = request.getMatricula().trim().toUpperCase();
@@ -126,15 +127,15 @@ public class VehiculoService {
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.save(v));
     }
 
-    public VehiculoResponse updateVehiculo(int idVehiculo, VehiculoRequest request){
-        if (idVehiculo != request.getId()){
+    public VehiculoResponse updateVehiculo(int idVehiculo, VehiculoRequest request) {
+        if (idVehiculo != request.getId()) {
             throw new VehiculoException("El id del path y el body no coinciden.");
         }
         Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (c.isEmpty()){
+        if (c.isEmpty()) {
             throw new ConductorNotFoundException("Aún no eres conductor.");
         }
-        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, c.get().getId())){
+        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, c.get().getId())) {
             throw new VehiculoNotFoundException("No tiene un vehículo con dicho id");
         }
         Vehiculo vDB = this.vehiculoRepository.findById(idVehiculo).get();
@@ -146,21 +147,22 @@ public class VehiculoService {
         return VehiculoMapper.mapVehiculoToDto(vDB);
     }
 
-    public String delete(int idVehiculo){
+    public String delete(int idVehiculo) {
         Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        int idConductor = c.map(Conductor::getId).orElseGet(() -> conductorService.autoCreate(getCurrentUsuario().getId()).getId());
-        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)){
+        int idConductor = c.map(Conductor::getId)
+                .orElseGet(() -> conductorService.autoCreate(getCurrentUsuario().getId()).getId());
+        if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, idConductor)) {
             throw new VehiculoNotFoundException("No tiene un vehículo con dicho id");
         }
         this.vehiculoRepository.deleteById(idVehiculo);
         return "Vehiculo " + idVehiculo + " eliminado con éxito.";
     }
 
-    private Usuario getCurrentUsuario(){
+    private Usuario getCurrentUsuario() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Usuario> u = usuarioRepository.findByUsername(username);
-        if (u.isEmpty()){
-            throw new ConductorNotFoundException("No eres usuario.");
+        if (u.isEmpty()) {
+            throw new UsuarioNotFoundException("No eres usuario");
         }
         return u.get();
     }

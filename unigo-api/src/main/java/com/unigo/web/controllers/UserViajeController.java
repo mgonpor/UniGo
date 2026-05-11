@@ -49,7 +49,7 @@ public class UserViajeController {
 
     @PutMapping("/{idViaje}/reserva/{idReserva}/confirmar")
     public ResponseEntity<?> confirmarReserva(@PathVariable int idViaje, @PathVariable int idReserva){
-        return ResponseEntity.ok(viajeService.confimarReserva(idViaje, idReserva));
+        return ResponseEntity.ok(viajeService.confirmarReserva(idViaje, idReserva));
     }
 
     @PutMapping("/{idViaje}/reserva/{idReserva}/cancelar")
@@ -57,7 +57,18 @@ public class UserViajeController {
         return ResponseEntity.ok(viajeService.cancelarReserva(idViaje, idReserva));
     }
 
+    // CONDUCTOR
+    @GetMapping("/{idViaje}/reservas")
+    public ResponseEntity<?> getReservasByIdViaje(@PathVariable int idViaje){
+        return ResponseEntity.ok(viajeService.getReservasByIdViaje(idViaje));
+    }
+
     // PASAJERO
+    @GetMapping("/{idViaje}/pasajero")
+    public ResponseEntity<?> getViajePasajero(@PathVariable int idViaje){
+        return ResponseEntity.ok(viajeService.getViajeByIdPasajero(idViaje));
+    }
+
     @GetMapping("/historial")
     public ResponseEntity<?> getMisViajesPasajero(){
         return ResponseEntity.ok(viajeService.getMisViajesPasajero());
