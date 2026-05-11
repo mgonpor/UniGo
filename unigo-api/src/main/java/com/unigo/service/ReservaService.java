@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,33 +36,33 @@ public class ReservaService {
     private ConductorRepository conductorRepository;
 
     // ADMIN
-    public List<ReservaResponse> findAll(){
+    public List<ReservaResponse> findAll() {
         return reservaRepository.findAll().stream()
                 .map(ReservaMapper::mapReservaToDto)
                 .toList();
     }
 
-    public ReservaResponse findById(int id){
-        if(!reservaRepository.existsById(id)){
+    public ReservaResponse findById(int id) {
+        if (!reservaRepository.existsById(id)) {
             throw new ReservaNotFoundException("Reserva con id " + id + " no encontrada");
         }
         return ReservaMapper.mapReservaToDto(reservaRepository.findById(id).get());
     }
 
-    public ReservaResponse createAdmin(int idPasajero, int idViaje){
-        if(!pasajeroRepository.existsById(idPasajero)){
+    public ReservaResponse createAdmin(int idPasajero, int idViaje) {
+        if (!pasajeroRepository.existsById(idPasajero)) {
             throw new PasajeroNotFoundException("Pasajero " + idPasajero + " no encontrado");
         }
-        if(!viajeRepository.existsById(idViaje)){
+        if (!viajeRepository.existsById(idViaje)) {
             throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
-        }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
+        } else if (viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE) {
             throw new ViajeException("Viaje no disponible");
         }
         Viaje v = viajeRepository.findById(idViaje).get();
-        if(v.getPlazasDisponibles() < 1){
+        if (v.getPlazasDisponibles() < 1) {
             throw new ViajeException("No hay plazas disponibles");
-        }else{
-            v.setPlazasDisponibles(v.getPlazasDisponibles()-1);
+        } else {
+            v.setPlazasDisponibles(v.getPlazasDisponibles() - 1);
             viajeRepository.save(v);
         }
         Reserva r = new Reserva();
@@ -78,80 +77,85 @@ public class ReservaService {
         return ReservaMapper.mapReservaToDto(r);
     }
 
-    public ReservaResponse updateAdmin(int idReserva, int idPasajero, int idViaje, ReservaRequest request){
-        if(idReserva != request.getId()){
+    public ReservaResponse updateAdmin(int idReserva, int idPasajero, int idViaje, ReservaRequest request) {
+        if (idReserva != request.getId()) {
             throw new ReservaException("El id del path y el body de la reserva no coinciden");
         }
-        if(idPasajero != request.getIdPasajero()){
+        if (idPasajero != request.getIdPasajero()) {
             throw new ReservaException("El id del path y el body de pasajero no coinciden");
         }
-        if(!reservaRepository.existsById(idReserva)){
+        if (!reservaRepository.existsById(idReserva)) {
             throw new ReservaNotFoundException("La reserva indicada no existe");
         }
-        if(!pasajeroRepository.existsById(idPasajero)){
+        if (!pasajeroRepository.existsById(idPasajero)) {
             throw new PasajeroNotFoundException("Pasajero " + idPasajero + " no encontrado");
         }
-        if(!viajeRepository.existsById(idViaje)){
+        if (!viajeRepository.existsById(idViaje)) {
             throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
-        }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
+        } else if (viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE) {
             throw new ViajeException("Viaje no disponible");
         }
         EstadoReserva e;
         try {
             e = EstadoReserva.valueOf(request.getEstadoReserva().trim().toUpperCase());
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             throw new ReservaException("El string enviado no coincide con ningún estado posible");
         }
         Reserva r = ReservaMapper.mapDtoToReserva(request);
         r.setIdViaje(idViaje);
         r.setEstadoReserva(e);
+        r.setValoracionNumerica(request.getValoracionNumerica());
+        r.setValoracionTexto(request.getValoracionTexto());
         reservaRepository.save(r);
         return ReservaMapper.mapReservaToDto(r);
     }
 
     public String deleteAdmin(int id) {
-        if(!reservaRepository.existsById(id)){
+        if (!reservaRepository.existsById(id)) {
             throw new ReservaNotFoundException("Reserva con id " + id + " no encontrada");
         }
         Reserva r = reservaRepository.findById(id).get();
+        if (!viajeRepository.existsById(r.getIdViaje())) {
+            throw new ViajeNotFoundException("Viaje " + r.getIdViaje() + " no encontrado");
+        }
         Viaje v = viajeRepository.findById(r.getIdViaje()).get();
-        v.setPlazasDisponibles(v.getPlazasDisponibles()+1);
+        v.setPlazasDisponibles(v.getPlazasDisponibles() + 1);
         reservaRepository.deleteById(id);
         return "Reserva " + id + " eliminada con éxito.";
     }
 
     // USER
-    public List<ReservaResponse> getMisReservas(){
+    public List<ReservaResponse> getMisReservas() {
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+        if (p.isEmpty()) {
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
         return reservaRepository.findAllByIdPasajero(p.get().getId()).stream()
                 .map(ReservaMapper::mapReservaToDto)
                 .toList();
     }
 
-    public ReservaResponse getMiReservaById(int id){
+    public ReservaResponse getMiReservaById(int id) {
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+        if (p.isEmpty()) {
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
-        if(!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())){
+        if (!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())) {
             throw new ReservaNotFoundException("Reserva no encontrada");
         }
         return ReservaMapper.mapReservaToDto(reservaRepository.findByIdAndIdPasajero(id, p.get().getId()).get());
     }
 
-    public List<ReservaResponse> getMisReservasByEstado(String estado){
+    public List<ReservaResponse> getMisReservasByEstado(String estado) {
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+        if (p.isEmpty()) {
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
         estado = estado.trim().toUpperCase();
         EstadoReserva e;
         try {
             e = EstadoReserva.valueOf(estado);
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             throw new ViajeException("El string enviado no coincide con ningún estado posible");
         }
         return reservaRepository.findAllByIdPasajeroAndEstadoReserva(p.get().getId(), e).stream()
@@ -159,66 +163,73 @@ public class ReservaService {
                 .toList();
     }
 
-    public ReservaResponse createReserva(int idViaje){
+    public ReservaResponse createReserva(int idViaje) {
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+        if (p.isEmpty()) {
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
-        if(!viajeRepository.existsById(idViaje)){
+        if (!viajeRepository.existsById(idViaje)) {
             throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
-        }else if(viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE){
+        } else if (viajeRepository.findById(idViaje).get().getEstadoViaje() != EstadoViaje.DISPONIBLE) {
             throw new ViajeException("Viaje no disponible");
         }
         Viaje v = viajeRepository.findById(idViaje).get();
-        if(v.getPlazasDisponibles() < 1){
+        if (v.getPlazasDisponibles() < 1) {
             throw new ViajeException("No hay plazas disponibles");
-        }else{
-            v.setPlazasDisponibles(v.getPlazasDisponibles()-1);
+        } else {
+            v.setPlazasDisponibles(v.getPlazasDisponibles() - 1);
             viajeRepository.save(v);
         }
         return this.createAdmin(p.get().getId(), idViaje);
     }
+
     // NO UPDATE NI DELETE
-    public String candelarReservaPasajero(int id){
+    public String cancelarReservaPasajero(int id) {
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+        if (p.isEmpty()) {
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
-        if(!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())){
+        if (!reservaRepository.existsByIdAndIdPasajero(id, p.get().getId())) {
             throw new ReservaNotFoundException("Reserva no encontrada");
         }
         Reserva r = reservaRepository.findByIdAndIdPasajero(id, p.get().getId()).get();
+        if (!viajeRepository.existsById(r.getIdViaje())) {
+            throw new ViajeNotFoundException("Viaje " + r.getIdViaje() + " no encontrado");
+        }
         Viaje v = viajeRepository.findById(r.getIdViaje()).get();
-        v.setPlazasDisponibles(v.getPlazasDisponibles()+1);
+        v.setPlazasDisponibles(v.getPlazasDisponibles() + 1);
         viajeRepository.save(v);
         r.setEstadoReserva(EstadoReserva.CANCELADA);
         this.reservaRepository.deleteById(id);
         return "Reserva " + id + " eliminada con éxito.";
     }
 
-    public ReservaResponse ponerValoraciones(int idReserva, int valNum, String valText){
+    public ReservaResponse ponerValoraciones(int idReserva, int valNum, String valText) {
         Optional<Pasajero> p = pasajeroRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (p.isEmpty()){
-            throw new ConductorNotFoundException("No eres pasajero.");
+        if (p.isEmpty()) {
+            throw new PasajeroNotFoundException("No eres pasajero.");
         }
-        if(!reservaRepository.existsByIdAndIdPasajero(idReserva, p.get().getId())){
+        if (!reservaRepository.existsByIdAndIdPasajero(idReserva, p.get().getId())) {
             throw new ReservaNotFoundException("Reserva no encontrada");
         }
         Reserva rDB = reservaRepository.findById(idReserva).get();
-        if (viajeRepository.findById(rDB.getId()).get().getFechaSalida().isBefore(LocalDate.now())){
+        if (!viajeRepository.existsById(rDB.getIdViaje())) {
+            throw new ViajeNotFoundException("Viaje " + rDB.getIdViaje() + " no encontrado");
+        }
+        if (viajeRepository.findById(rDB.getIdViaje()).get().getFechaSalida().isAfter(LocalDate.now())) {
             throw new ViajeException("El viaje aún no ha iniciado");
         }
-        if(0 < valNum && valNum <= 5) {
+        if (0 < valNum && valNum <= 5) {
             // Lógica actualizar Conductor
-            Optional<Conductor> optC = conductorRepository.findById(viajeRepository.findById(rDB.getIdViaje()).get().getIdConductor());
-            if (optC.isEmpty()){
+            Optional<Conductor> optC = conductorRepository
+                    .findById(viajeRepository.findById(rDB.getIdViaje()).get().getIdConductor());
+            if (optC.isEmpty()) {
                 throw new ConductorNotFoundException("No conductor del viaje no encontrado");
             }
             Conductor cDB = optC.get();
             cDB.setReputacion(
-                    (float) (cDB.getReputacion() +  (valNum - cDB.getReputacion()) / (cDB.getNumValoraciones()+1.0) )
-            );
-            cDB.setNumValoraciones(cDB.getNumValoraciones()+1);
+                    (float) (cDB.getReputacion() + (valNum - cDB.getReputacion()) / (cDB.getNumValoraciones() + 1.0)));
+            cDB.setNumValoraciones(cDB.getNumValoraciones() + 1);
             rDB.setValoracionNumerica(valNum);
             rDB.setValoracionTexto(Objects.requireNonNullElse(valText, ""));
         }
@@ -226,8 +237,8 @@ public class ReservaService {
     }
 
     // Aux ViajeService
-    public void confirmarReservaDesdeViaje(int id){
-        if (!reservaRepository.existsById(id)){
+    public void confirmarReservaDesdeViaje(int id) {
+        if (!reservaRepository.existsById(id)) {
             throw new ReservaNotFoundException("La reserva no existe en su tabla, pero si en viaje. INTEGRATION ERROR");
         }
         Reserva r = reservaRepository.findById(id).get();
@@ -235,33 +246,34 @@ public class ReservaService {
         reservaRepository.save(r);
     }
 
-    public void cancelarReservaDesdeViaje(int id){
-        if (!reservaRepository.existsById(id)){
-            throw new ReservaNotFoundException("La reserva no existe en base de datos, pero si en viaje. INTEGRATION ERROR");
+    public void cancelarReservaDesdeViaje(int id) {
+        if (!reservaRepository.existsById(id)) {
+            throw new ReservaNotFoundException(
+                    "La reserva no existe en base de datos, pero si en viaje. INTEGRATION ERROR");
         }
         Reserva r = reservaRepository.findById(id).get();
         r.setEstadoReserva(EstadoReserva.CANCELADA);
         reservaRepository.save(r);
     }
 
-    public List<ReservaResponse> getReservasByIdViaje(int idViaje){
+    public List<ReservaResponse> getReservasByIdViaje(int idViaje) {
         return reservaRepository.findAllByIdViaje(idViaje).stream()
                 .map(ReservaMapper::mapReservaToDto)
                 .toList();
     }
 
-    public List<Integer> getHistoricoViajesHechos(int idPasajero){
+    public List<Integer> getHistoricoViajesHechos(int idPasajero) {
         return reservaRepository.findAllByIdPasajeroAndEstadoReserva(idPasajero, EstadoReserva.CONFIRMADA)
                 .stream().map(Reserva::getIdViaje)
                 .toList();
     }
 
     // AUX
-    private Usuario getCurrentUsuario(){
+    private Usuario getCurrentUsuario() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Usuario> u = usuarioRepository.findByUsername(username);
-        if (u.isEmpty()){
-            throw new ConductorNotFoundException("No eres usuario.");
+        if (u.isEmpty()) {
+            throw new UsuarioNotFoundException("No eres usuario.");
         }
         return u.get();
     }

@@ -24,9 +24,6 @@ public class ReservaMapper {
         r.setId(dto.getId());
         r.setIdPasajero(dto.getIdPasajero());
         r.setFechaReserva(dto.getFechaReserva());
-        r.setValoracionNumerica(dto.getValoracionNumerica());
-        r.setValoracionTexto(dto.getValoracionTexto());
-        r.setPagado(dto.getPagado());
 
         // Sin idViaje ni EstadoReserva
 

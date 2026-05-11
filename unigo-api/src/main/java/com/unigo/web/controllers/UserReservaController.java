@@ -34,7 +34,7 @@ public class UserReservaController {
 
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<?> candelarReservaPasajero(@PathVariable int id){
-        return ResponseEntity.ok(reservaService.candelarReservaPasajero(id));
+        return ResponseEntity.ok(reservaService.cancelarReservaPasajero(id));
     }
 
     @PutMapping("/{id}/valorar")

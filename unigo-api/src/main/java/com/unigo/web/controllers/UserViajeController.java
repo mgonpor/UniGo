@@ -49,7 +49,7 @@ public class UserViajeController {
 
     @PutMapping("/{idViaje}/reserva/{idReserva}/confirmar")
     public ResponseEntity<?> confirmarReserva(@PathVariable int idViaje, @PathVariable int idReserva){
-        return ResponseEntity.ok(viajeService.confimarReserva(idViaje, idReserva));
+        return ResponseEntity.ok(viajeService.confirmarReserva(idViaje, idReserva));
     }
 
     @PutMapping("/{idViaje}/reserva/{idReserva}/cancelar")
