@@ -17,9 +17,10 @@ public class JwtUtils {
     @Autowired
     private JwtConfig config;
 
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateAccessToken(UserDetails userDetails, int userId) {
         return JWT.create()
                 .withSubject(userDetails.getUsername())
+                .withClaim("userId", userId)
                 .withClaim("roles", userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .withIssuedAt(new Date())
@@ -28,9 +29,10 @@ public class JwtUtils {
                 .sign(Algorithm.HMAC256(config.getSecret()));
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
+    public String generateRefreshToken(UserDetails userDetails, int userId) {
         return JWT.create()
                 .withSubject(userDetails.getUsername())
+                .withClaim("userId", userId)
                 .withClaim("roles", userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .withClaim("type", "refresh")
@@ -56,6 +58,7 @@ public class JwtUtils {
         DecodedJWT jwt = JWT.decode(token);
         return JWT.create()
                 .withSubject(jwt.getSubject())
+                .withClaim("userId", jwt.getClaim("userId").asInt())
                 .withClaim("roles", jwt.getClaim("roles").asList(String.class))
                 .withIssuedAt(new Date())
                 .withIssuer(config.getIssuer())
@@ -67,6 +70,7 @@ public class JwtUtils {
         DecodedJWT jwt = JWT.decode(token);
         return JWT.create()
                 .withSubject(jwt.getSubject())
+                .withClaim("userId", jwt.getClaim("userId").asInt())
                 .withClaim("roles", jwt.getClaim("roles").asList(String.class))
                 .withClaim("type", "refresh")
                 .withIssuedAt(new Date())

@@ -35,7 +35,7 @@ public class LoginService {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateAccessToken(userDetails);
+        String token = jwtUtil.generateAccessToken(userDetails, u.getId());
 
         this.pasajeroService.autoCreate(u.getId());
 
@@ -47,8 +47,10 @@ public class LoginService {
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String accessToken = jwtUtil.generateAccessToken(userDetails);
-        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+        Usuario u = this.usuarioService.findByUsername(request.getUsername());
+
+        String accessToken = jwtUtil.generateAccessToken(userDetails, u.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails, u.getId());
 
         return new LoginResponse(accessToken, refreshToken);
     }

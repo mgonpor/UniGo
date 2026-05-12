@@ -37,6 +37,15 @@ public class Viaje {
     @Column(name = "fecha_salida",  nullable = false)
     private LocalDate fechaSalida;
 
+    @Column(name = "hora_salida")
+    private java.time.LocalTime horaSalida;
+
+    @Column(name = "origen_coords")
+    private String origenCoords;
+
+    @Column(name = "destino_coords")
+    private String destinoCoords;
+
     @Column(name = "plazas_disponibles",   nullable = false)
     private int plazasDisponibles;
 

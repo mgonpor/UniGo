@@ -268,6 +268,45 @@ public class ReservaService {
                 .toList();
     }
 
+    public List<ReservaResponse> getReservasByViaje(int idViaje){
+        if(!viajeRepository.existsById(idViaje)){
+            throw new ViajeNotFoundException("Viaje " + idViaje + " no encontrado");
+        }
+        return reservaRepository.findAllByIdViaje(idViaje).stream()
+                .map(ReservaMapper::mapReservaToDto)
+                .toList();
+    }
+
+    public List<ReservaResponse> getReservasConductor(){
+        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
+        if (c.isEmpty()){
+            throw new ConductorNotFoundException("Aún no eres conductor.");
+        }
+        List<Viaje> misViajes = viajeRepository.findAllByIdConductor(c.get().getId());
+        List<Integer> idsViajes = misViajes.stream().map(Viaje::getId).toList();
+        return reservaRepository.findAll().stream()
+                .filter(r -> idsViajes.contains(r.getIdViaje()))
+                .map(ReservaMapper::mapReservaToDto)
+                .toList();
+    }
+
+    public ReservaResponse cambiarEstadoReserva(int idReserva, String estado){
+        if(!reservaRepository.existsById(idReserva)){
+            throw new ReservaNotFoundException("Reserva con id " + idReserva + " no encontrada");
+        }
+        estado = estado.trim().toUpperCase();
+        EstadoReserva e;
+        try {
+            e = EstadoReserva.valueOf(estado);
+        }catch (IllegalArgumentException ex){
+            throw new ReservaException("El string enviado no coincide con ningún estado posible");
+        }
+        Reserva r = reservaRepository.findById(idReserva).get();
+        r.setEstadoReserva(e);
+        reservaRepository.save(r);
+        return ReservaMapper.mapReservaToDto(r);
+    }
+
     // AUX
     private Usuario getCurrentUsuario() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

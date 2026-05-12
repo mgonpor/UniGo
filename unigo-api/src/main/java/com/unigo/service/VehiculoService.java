@@ -118,8 +118,8 @@ public class VehiculoService {
 
         Vehiculo v = VehiculoMapper.mapDtoToVehiculo(request);
         String matricula = request.getMatricula().trim().toUpperCase();
-        if (!matricula.matches("^[0-9]{4}[B-DF-HJ-NP-TV-Z]{3}$")) {
-            throw new VehiculoException("La matrícula debe ser válida.");
+        if (!matricula.matches("^[A-Z0-9]{7,8}$")) {
+            throw new VehiculoException("La matrícula debe tener entre 7 y 8 caracteres alfanuméricos.");
         }
         v.setId(0);
         v.setIdConductor(idConductor);

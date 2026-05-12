@@ -19,9 +19,16 @@ public class ViajeMapper {
         dto.setOrigen(viaje.getOrigen());
         dto.setDestino(viaje.getDestino());
         dto.setFechaSalida(viaje.getFechaSalida());
+        dto.setHoraSalida(viaje.getHoraSalida());
+        dto.setOrigenCoords(viaje.getOrigenCoords());
+        dto.setDestinoCoords(viaje.getDestinoCoords());
         dto.setPlazasDisponibles(viaje.getPlazasDisponibles());
         dto.setPrecioPorPlaza(viaje.getPrecioPlaza());
         dto.setEstadoViaje(viaje.getEstadoViaje().toString());
+
+        if (viaje.getConductor() != null) {
+            dto.setConductor(ConductorMapper.mapConductorToDto(viaje.getConductor()));
+        }
 
         List<ReservaResponse> reservas = new ArrayList<>();
 
@@ -42,6 +49,9 @@ public class ViajeMapper {
         viaje.setOrigen(dto.getOrigen());
         viaje.setDestino(dto.getDestino());
         viaje.setFechaSalida(dto.getFechaSalida());
+        viaje.setHoraSalida(dto.getHoraSalida());
+        viaje.setOrigenCoords(dto.getOrigenCoords());
+        viaje.setDestinoCoords(dto.getDestinoCoords());
         viaje.setPlazasDisponibles(dto.getPlazasDisponibles());
         viaje.setPrecioPlaza(dto.getPrecioPorPlaza());
         // sin estado ni lista de reservas, lo decide el metodo

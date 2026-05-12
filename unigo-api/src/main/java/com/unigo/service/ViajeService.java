@@ -142,13 +142,9 @@ public class ViajeService {
     }
 
     public ViajeResponse getMiViajeById(int idViaje){
-        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (c.isEmpty()){
-            throw new ConductorNotFoundException("Aún no eres conductor.");
-        }
-        Optional<Viaje> v = viajeRepository.findByIdAndIdConductor(idViaje, c.get().getId());
+        Optional<Viaje> v = viajeRepository.findById(idViaje);
         if(v.isEmpty()){
-            throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + idViaje);
+            throw new ViajeNotFoundException("No hemos encontrado el viaje con id " + idViaje);
         }
         return ViajeMapper.mapViajeToDto(v.get());
     }

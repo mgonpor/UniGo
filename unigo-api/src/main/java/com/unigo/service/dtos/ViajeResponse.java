@@ -17,8 +17,12 @@ public class ViajeResponse {
     private String origen;
     private String destino;
     private LocalDate fechaSalida;
+    private java.time.LocalTime horaSalida;
+    private String origenCoords;
+    private String destinoCoords;
     private Integer plazasDisponibles;
     private Double precioPorPlaza;
+    private ConductorResponse conductor;
     private String estadoViaje;
     private List<ReservaResponse> reservas;
 
