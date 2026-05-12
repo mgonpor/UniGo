@@ -23,7 +23,9 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +69,7 @@ class LoginServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(jwtUtil.generateAccessToken(userDetails)).thenReturn("mocked-access-token");
+        when(jwtUtil.generateAccessToken(eq(userDetails), eq(1))).thenReturn("mocked-access-token");
         when(pasajeroService.autoCreate(1)).thenReturn(null);
 
         String token = loginService.registrar(request);
@@ -75,7 +77,7 @@ class LoginServiceTest {
         assertEquals("mocked-access-token", token);
         verify(usuarioService, times(1)).create(request);
         verify(pasajeroService, times(1)).autoCreate(1);
-        verify(jwtUtil, times(1)).generateAccessToken(userDetails);
+        verify(jwtUtil, times(1)).generateAccessToken(userDetails, 1);
     }
 
     @Test
@@ -84,11 +86,16 @@ class LoginServiceTest {
         request.setUsername("testuser");
         request.setPassword("password");
 
+        Usuario usuario = new Usuario();
+        usuario.setId(1);
+        usuario.setUsername("testuser");
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(jwtUtil.generateAccessToken(userDetails)).thenReturn("access-token");
-        when(jwtUtil.generateRefreshToken(userDetails)).thenReturn("refresh-token");
+        when(usuarioService.findByUsername("testuser")).thenReturn(usuario);
+        when(jwtUtil.generateAccessToken(eq(userDetails), eq(1))).thenReturn("access-token");
+        when(jwtUtil.generateRefreshToken(eq(userDetails), eq(1))).thenReturn("refresh-token");
 
         LoginResponse response = loginService.login(request);
 
