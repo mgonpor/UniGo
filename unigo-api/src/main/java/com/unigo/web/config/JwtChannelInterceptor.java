@@ -14,12 +14,30 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Autenticacion JWT del canal STOMP entrante.
+ *
+ * En STOMP el Principal SOLO se asocia automaticamente a la WebSocketSession
+ * cuando la auth ocurre en el handshake HTTP (HandshakeHandler). Como nosotros
+ * autenticamos via cabecera del frame CONNECT, el accessor.setUser(...) solo
+ * afecta a ESE mensaje; los frames SUBSCRIBE / SEND posteriores llegan sin
+ * Principal y los interceptores aguas abajo (SubscriptionInterceptor, los
+ * @MessageMapping) lo ven como null.
+ *
+ * Solucion: en CONNECT guardamos el Authentication en los sessionAttributes
+ * de la WebSocketSession (compartidos entre todos los frames de esa sesion),
+ * y en CUALQUIER mensaje posterior que llegue sin Principal lo restauramos
+ * desde ahi.
+ */
 @Component
 public class JwtChannelInterceptor implements ChannelInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(JwtChannelInterceptor.class);
+    private static final String SESSION_USER_KEY = "unigo.stomp.principal";
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -28,16 +46,26 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        // Usamos wrap() porque siempre devuelve un accessor valido sobre el
-        // mensaje (a diferencia de getAccessor() que puede devolver null si
-        // el tipo no coincide). wrap() crea una vista mutable apta para
-        // setUser, que es lo que necesitamos para propagar el Principal.
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-
-        if (!StompCommand.CONNECT.equals(accessor.getCommand())) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if (accessor == null) {
             return message;
         }
 
+        StompCommand command = accessor.getCommand();
+        if (command == null) {
+            return message;
+        }
+
+        if (StompCommand.CONNECT.equals(command)) {
+            autenticarConnect(accessor);
+        } else if (accessor.getUser() == null) {
+            // CONNECT ya almaceno el Principal; lo rescatamos para los demas frames.
+            restaurarPrincipalDeSesion(accessor);
+        }
+        return message;
+    }
+
+    private void autenticarConnect(StompHeaderAccessor accessor) {
         List<String> authorization = accessor.getNativeHeader("Authorization");
         if (authorization == null || authorization.isEmpty()) {
             log.warn("[STOMP CONNECT] sin cabecera Authorization");
@@ -53,28 +81,42 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         try {
             String username = jwtUtils.extractUsername(token);
             if (username == null) {
-                log.warn("[STOMP CONNECT] token sin subject");
                 throw new IllegalArgumentException("Token JWT sin subject");
             }
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (!jwtUtils.validateToken(token, userDetails)) {
-                log.warn("[STOMP CONNECT] token invalido para {}", username);
                 throw new IllegalArgumentException("Token JWT invalido");
             }
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             accessor.setUser(authentication);
-            accessor.setLeaveMutable(true);
-            log.info("[STOMP CONNECT] OK usuario={}", username);
 
-            // Reemplazamos el mensaje con uno que conserve el accessor mutable,
-            // necesario para que el Principal viaje a los siguientes mensajes.
-            return org.springframework.messaging.support.MessageBuilder
-                    .createMessage(message.getPayload(), accessor.getMessageHeaders());
+            // Persistimos el Principal en los sessionAttributes de la WS session,
+            // que sobreviven a lo largo de toda la conexion. Cualquier frame posterior
+            // sin Principal podra restaurarlo desde aqui.
+            Map<String, Object> attrs = accessor.getSessionAttributes();
+            if (attrs != null) {
+                attrs.put(SESSION_USER_KEY, authentication);
+            }
+
+            log.info("[STOMP CONNECT] OK usuario={} sessionId={}", username, accessor.getSessionId());
         } catch (JWTVerificationException e) {
             log.warn("[STOMP CONNECT] JWT invalido: {}", e.getMessage());
             throw new IllegalArgumentException("Token JWT invalido o expirado: " + e.getMessage());
+        }
+    }
+
+    private void restaurarPrincipalDeSesion(StompHeaderAccessor accessor) {
+        Map<String, Object> attrs = accessor.getSessionAttributes();
+        if (attrs == null) {
+            return;
+        }
+        Object stored = attrs.get(SESSION_USER_KEY);
+        if (stored instanceof Principal p) {
+            accessor.setUser(p);
+            log.debug("[STOMP {}] Principal restaurado desde sessionAttributes para {}",
+                    accessor.getCommand(), p.getName());
         }
     }
 }
