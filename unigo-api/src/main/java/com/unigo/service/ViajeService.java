@@ -155,7 +155,7 @@ public class ViajeService {
             throw new ConductorNotFoundException("Aún no eres conductor.");
         }
         if(request.getFechaSalida().isBefore(LocalDate.now())){
-            throw new ViajeException("La fecha de salida debe ser anterior.");
+            throw new ViajeException("La fecha de salida no puede ser anterior a hoy.");
         }
         if (request.getPrecioPorPlaza() > precioMaximo ||  request.getPrecioPorPlaza() < 0){
             throw new ViajeException("Precio no válido");
@@ -236,13 +236,22 @@ public class ViajeService {
             throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + idViaje);
         }
         Viaje vDB = viajeRepository.findById(idViaje).get();
-        if(! vDB.getReservas().stream().filter(r -> r.getId() == idReserva && r.getEstadoReserva().equals(EstadoReserva.PENDIENTE)).toList().isEmpty()){
-            reservaService.confirmarReservaDesdeViaje(idReserva);
-        }else {
+        if (vDB.getEstadoViaje() != EstadoViaje.DISPONIBLE) {
+            throw new ViajeException("El viaje ya no acepta cambios de reserva (no esta DISPONIBLE)");
+        }
+        boolean reservaConfirmable = vDB.getReservas().stream()
+                .anyMatch(r -> r.getId() == idReserva && r.getEstadoReserva() == EstadoReserva.PENDIENTE);
+        if (!reservaConfirmable) {
             throw new ViajeException("Reserva no existente o ya confirmada");
         }
+        if (vDB.getPlazasDisponibles() < 1) {
+            throw new ViajeException("No hay plazas disponibles para confirmar");
+        }
+        // Decrementamos la plaza UNA sola vez en este punto (la creacion de
+        // la reserva no toca las plazas; solo lo hace la confirmacion).
         vDB.setPlazasDisponibles(vDB.getPlazasDisponibles() - 1);
         viajeRepository.save(vDB);
+        reservaService.confirmarReservaDesdeViaje(idReserva);
         return ViajeMapper.mapViajeToDto(viajeRepository.findById(idViaje).get());
     }
 
@@ -298,7 +307,9 @@ public class ViajeService {
 
     // todo: filtrado origen y destino
     public List<ViajeResponse> getViajesDisponibles(){
+        // Solo mostramos viajes DISPONIBLES, futuros y con al menos una plaza libre.
         return viajeRepository.findAllByEstadoViajeAndFechaSalidaAfter(EstadoViaje.DISPONIBLE, LocalDate.now()).stream()
+                .filter(v -> v.getPlazasDisponibles() > 0)
                 .map(ViajeMapper::mapViajeToDto)
                 .toList();
     }
