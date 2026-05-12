@@ -28,7 +28,8 @@ public class SubscriptionInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if (accessor == null) return message;
         if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             return message;
         }

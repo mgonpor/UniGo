@@ -13,6 +13,11 @@ public class AdminUsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @GetMapping
+    public ResponseEntity<?> getAllUsuarios(){
+        return ResponseEntity.ok(usuarioService.getAllUsuarios());
+    }
+
     @PostMapping("/nuevo")
     public ResponseEntity<?> crearUsuario(@RequestBody RegisterRequest request){
         return ResponseEntity.ok(usuarioService.crearUsuarioComoAdmin(request));

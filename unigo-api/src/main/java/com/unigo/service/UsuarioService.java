@@ -3,6 +3,7 @@ package com.unigo.service;
 import com.unigo.persistence.entities.Usuario;
 import com.unigo.persistence.repositories.UsuarioRepository;
 import com.unigo.service.dtos.RegisterRequest;
+import com.unigo.service.dtos.UsuarioResponse;
 import com.unigo.service.exceptions.UsuarioException;
 import com.unigo.service.exceptions.UsuarioNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,6 +48,12 @@ public class UsuarioService implements UserDetailsService {
     public Usuario findByUsername(String username) {
         return usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no se ha encontrado"));
+    }
+
+    public List<UsuarioResponse> getAllUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(u -> new UsuarioResponse(u.getId(), u.getNombre(), u.getUsername(), u.getEmail(), u.getRol()))
+                .toList();
     }
 
     // Acciones especiales de ADMIN

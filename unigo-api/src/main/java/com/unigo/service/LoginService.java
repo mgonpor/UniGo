@@ -30,16 +30,17 @@ public class LoginService {
     @Autowired  //Para crear pasajero automáticamente
     private PasajeroService pasajeroService;
 
-    public String registrar(RegisterRequest request) {
+    public LoginResponse registrar(RegisterRequest request) {
         Usuario u = this.usuarioService.create(request);
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateAccessToken(userDetails, u.getId());
+        String accessToken  = jwtUtil.generateAccessToken(userDetails, u.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails, u.getId());
 
         this.pasajeroService.autoCreate(u.getId());
 
-        return token;
+        return new LoginResponse(accessToken, refreshToken);
     }
 
     public LoginResponse login(LoginRequest request) {

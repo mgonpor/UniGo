@@ -23,6 +23,7 @@ public class ViajeResponse {
     private Integer plazasDisponibles;
     private Double precioPorPlaza;
     private ConductorResponse conductor;
+    private VehiculoResponse vehiculo;
     private String estadoViaje;
     private List<ReservaResponse> reservas;
 

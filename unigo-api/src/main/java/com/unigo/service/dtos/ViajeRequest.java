@@ -20,4 +20,5 @@ public class ViajeRequest {
     private String destinoCoords;
     private Integer plazasDisponibles;
     private Double precioPorPlaza;
+    private Integer idVehiculo;
 }

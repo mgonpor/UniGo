@@ -29,6 +29,13 @@ public class Viaje {
     @JoinColumn(name = "id_conductor", referencedColumnName = "id", insertable = false, updatable = false)
     private Conductor conductor;
 
+    @Column(name = "id_vehiculo")
+    private Integer idVehiculo;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "id_vehiculo", referencedColumnName = "id", insertable = false, updatable = false)
+    private Vehiculo vehiculo;
+
     @Column(nullable = false)
     private String origen;
     @Column(nullable = false)
@@ -56,10 +63,10 @@ public class Viaje {
     @Column(name = "estado_reserva",  nullable = false)
     private EstadoViaje estadoViaje;
 
-    @OneToMany(mappedBy = "viaje")
+    @OneToMany(mappedBy = "viaje", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Reserva> reservas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "viaje")
+    @OneToMany(mappedBy = "viaje", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore
     private List<Mensaje> mensajes = new ArrayList<>();
 

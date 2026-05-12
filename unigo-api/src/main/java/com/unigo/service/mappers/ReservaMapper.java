@@ -15,6 +15,8 @@ public class ReservaMapper {
         dto.setFechaReserva(reserva.getFechaReserva());
         dto.setPagado(reserva.isPagado());
         dto.setEstadoReserva(reserva.getEstadoReserva().toString());
+        dto.setValoracionNumerica(reserva.getValoracionNumerica());
+        dto.setValoracionTexto(reserva.getValoracionTexto());
 
         if (reserva.getPasajero() != null) {
             dto.setPasajero(PasajeroMapper.mapPasajeroToDto(reserva.getPasajero()));

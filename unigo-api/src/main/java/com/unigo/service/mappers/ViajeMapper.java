@@ -30,6 +30,10 @@ public class ViajeMapper {
             dto.setConductor(ConductorMapper.mapConductorToDto(viaje.getConductor()));
         }
 
+        if (viaje.getVehiculo() != null) {
+            dto.setVehiculo(VehiculoMapper.mapVehiculoToDto(viaje.getVehiculo()));
+        }
+
         List<ReservaResponse> reservas = new ArrayList<>();
 
         if(viaje.getReservas() != null){
@@ -54,6 +58,7 @@ public class ViajeMapper {
         viaje.setDestinoCoords(dto.getDestinoCoords());
         viaje.setPlazasDisponibles(dto.getPlazasDisponibles());
         viaje.setPrecioPlaza(dto.getPrecioPorPlaza());
+        viaje.setIdVehiculo(dto.getIdVehiculo());
         // sin estado ni lista de reservas, lo decide el metodo
 
         return viaje;

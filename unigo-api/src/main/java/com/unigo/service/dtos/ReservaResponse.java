@@ -18,6 +18,6 @@ public class ReservaResponse {
     private LocalDate fechaReserva;
     private Boolean pagado;
     private String estadoReserva;
-
-    // SIN VALORACIONES
+    private Integer valoracionNumerica;
+    private String valoracionTexto;
 }

@@ -72,7 +72,7 @@ class LoginServiceTest {
         when(jwtUtil.generateAccessToken(eq(userDetails), eq(1))).thenReturn("mocked-access-token");
         when(pasajeroService.autoCreate(1)).thenReturn(null);
 
-        String token = loginService.registrar(request);
+        String token = String.valueOf(loginService.registrar(request));
 
         assertEquals("mocked-access-token", token);
         verify(usuarioService, times(1)).create(request);

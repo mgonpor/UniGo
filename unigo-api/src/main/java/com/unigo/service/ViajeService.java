@@ -5,7 +5,9 @@ import com.unigo.persistence.entities.enums.EstadoReserva;
 import com.unigo.persistence.entities.enums.EstadoViaje;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.PasajeroRepository;
+import com.unigo.persistence.repositories.ReservaRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
+import com.unigo.persistence.repositories.VehiculoRepository;
 import com.unigo.persistence.repositories.ViajeRepository;
 import com.unigo.service.dtos.ReservaResponse;
 import com.unigo.service.dtos.ViajeRequest;
@@ -36,6 +38,12 @@ public class ViajeService {
 
     @Autowired
     private PasajeroRepository pasajeroRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private VehiculoRepository vehiculoRepository;
 
     @Autowired
     private ReservaService reservaService;
@@ -163,6 +171,10 @@ public class ViajeService {
         if (1 > request.getPlazasDisponibles()){
             throw new ViajeException("Plazas insuficientes");
         }
+        if (request.getIdVehiculo() != null
+                && !vehiculoRepository.existsByIdAndIdConductor(request.getIdVehiculo(), c.get().getId())) {
+            throw new ViajeException("El vehículo no pertenece a este conductor");
+        }
         Viaje newViaje = ViajeMapper.mapDtoToViaje(request);
         newViaje.setId(0);
         newViaje.setIdConductor(c.get().getId());
@@ -183,12 +195,17 @@ public class ViajeService {
         if (!viajeRepository.existsByIdAndIdConductor(id, c.get().getId())){
             throw new ViajeNotFoundException("Viaje " + id + " no relacionado con ese conductor");
         }
+        if (request.getIdVehiculo() != null
+                && !vehiculoRepository.existsByIdAndIdConductor(request.getIdVehiculo(), c.get().getId())) {
+            throw new ViajeException("El vehículo no pertenece a este conductor");
+        }
         Viaje vDB = viajeRepository.findById(id).get();
         vDB.setOrigen(request.getOrigen());
         vDB.setDestino(request.getDestino());
         vDB.setFechaSalida(request.getFechaSalida());
         vDB.setPlazasDisponibles(request.getPlazasDisponibles());
         vDB.setPrecioPlaza(request.getPrecioPorPlaza());
+        vDB.setIdVehiculo(request.getIdVehiculo());
         // NO SE PUEDE CAMBIAR EL ESTADO DESDE AQUÍ
         viajeRepository.save(vDB);
         return ViajeMapper.mapViajeToDto(vDB);
@@ -316,22 +333,29 @@ public class ViajeService {
 
     // Interceptor mensajeria. Recibe el id de Usuario (sub del JWT) y comprueba
     // si tiene derecho al chat del viaje (conductor o pasajero con reserva
-    // CONFIRMADA). OJO: hay que comparar contra el idUsuario del Conductor y
-    // del Pasajero, no contra sus ids de entidad (Conductor.id != Usuario.id).
+    // CONFIRMADA). Usa solo queries directas — sin navegar relaciones lazy,
+    // porque este metodo se llama desde el interceptor STOMP fuera de contexto HTTP.
     public boolean puedeAccederAlChat(int idUsuario, int idViaje) {
-        Viaje viaje = viajeRepository.findById(idViaje)
-                .orElseThrow(() -> new ViajeNotFoundException("Viaje no encontrado"));
+        if (!viajeRepository.existsById(idViaje)) {
+            throw new ViajeNotFoundException("Viaje no encontrado");
+        }
 
-        // 1. ¿Es el conductor?
-        if (viaje.getConductor() != null && viaje.getConductor().getIdUsuario() == idUsuario) {
-            return true;
+        // 1. ¿Es el conductor? Buscamos el Conductor por idUsuario y comparamos con Viaje.idConductor.
+        Optional<Conductor> conductor = conductorRepository.findByIdUsuario(idUsuario);
+        if (conductor.isPresent()) {
+            // Viaje.idConductor es el id de entidad del Conductor, no del Usuario.
+            if (viajeRepository.existsByIdAndIdConductor(idViaje, conductor.get().getId())) {
+                return true;
+            }
         }
 
         // 2. ¿Es un pasajero con reserva CONFIRMADA?
-        return viaje.getReservas().stream()
-                .anyMatch(r -> r.getPasajero() != null
-                        && r.getPasajero().getIdUsuario() == idUsuario
-                        && r.getEstadoReserva() == EstadoReserva.CONFIRMADA);
+        Optional<Pasajero> pasajero = pasajeroRepository.findByIdUsuario(idUsuario);
+        if (pasajero.isEmpty()) {
+            return false;
+        }
+        return reservaRepository.existsByIdViajeAndIdPasajeroAndEstadoReserva(
+                idViaje, pasajero.get().getId(), EstadoReserva.CONFIRMADA);
     }
 
     // AUX

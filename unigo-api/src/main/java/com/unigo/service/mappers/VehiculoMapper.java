@@ -12,6 +12,7 @@ public class VehiculoMapper {
         dto.setMarca(vehiculo.getMarca());
         dto.setModelo(vehiculo.getModelo());
         dto.setColor(vehiculo.getColor());
+        dto.setMatricula(vehiculo.getMatricula());
 
         return dto;
     }
