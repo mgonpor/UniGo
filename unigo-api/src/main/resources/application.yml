@@ -7,30 +7,33 @@ spring:
   application:
     name: unigo
   datasource:
-    url: mariadb://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:unigo}?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:admin}
+    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: ${DDL_AUTO}
-    show-sql: ${SHOW_SQL}
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:
-        format_sql: ${FORMAT_SQL}
+        format_sql: ${FORMAT_SQL:true}
     database: mysql
     database-platform: org.hibernate.dialect.MariaDBDialect
   main:
     allow-bean-definition-overriding: true
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:preprod}
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:2f5626185baf25cf286a0d831255970395de10fd29122a2bed6df10ea591f382W}
   access:
-    expires: ${JWT_ACCESS_EXPIRES}
+    expires: ${JWT_ACCESS_EXPIRES:3600000}
   refresh:
-    expires: ${JWT_REFRESH_EXPIRES}
-  issuer: ${JWT_ISSUER}
+    expires: ${JWT_REFRESH_EXPIRES:604800000}
+  issuer: ${JWT_ISSUER:unigo}
 
 frontend:
-  url: ${FRONTEND_URLS}
+  url: ${FRONTEND_URLS:http://localhost:5173,http://localhost:4173,http://localhost:3000}
 
-precioMaximo: ${PRECIO_MAXIMO}
+precioMaximo: ${PRECIO_MAXIMO:20}
