@@ -61,12 +61,7 @@ public class UserViajeController {
         return ResponseEntity.ok(viajeService.cancelarReserva(idViaje, idReserva));
     }
 
-    // CONDUCTOR
-    @GetMapping("/{idViaje}/reservas")
-    public ResponseEntity<?> getReservasByIdViaje(@PathVariable int idViaje){
-        return ResponseEntity.ok(viajeService.getReservasByIdViaje(idViaje));
-    }
-
+    // CONDUCTOR (delegado en ReservaService para cohesión de dominio)
     @GetMapping("/{idViaje}/reservas")
     public ResponseEntity<?> getReservasPorViaje(@PathVariable int idViaje){
         return ResponseEntity.ok(reservaService.getReservasByViaje(idViaje));
