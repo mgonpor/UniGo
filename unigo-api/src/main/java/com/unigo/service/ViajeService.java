@@ -314,22 +314,24 @@ public class ViajeService {
                 .toList();
     }
 
-    // Interceptor mensajeria
+    // Interceptor mensajeria. Recibe el id de Usuario (sub del JWT) y comprueba
+    // si tiene derecho al chat del viaje (conductor o pasajero con reserva
+    // CONFIRMADA). OJO: hay que comparar contra el idUsuario del Conductor y
+    // del Pasajero, no contra sus ids de entidad (Conductor.id != Usuario.id).
     public boolean puedeAccederAlChat(int idUsuario, int idViaje) {
         Viaje viaje = viajeRepository.findById(idViaje)
                 .orElseThrow(() -> new ViajeNotFoundException("Viaje no encontrado"));
 
         // 1. ¿Es el conductor?
-        if (viaje.getConductor().getId() == idUsuario) {
+        if (viaje.getConductor() != null && viaje.getConductor().getIdUsuario() == idUsuario) {
             return true;
         }
 
-        // 2. ¿Es un pasajero con reserva confirmada?
+        // 2. ¿Es un pasajero con reserva CONFIRMADA?
         return viaje.getReservas().stream()
-                .anyMatch(reserva ->
-                        reserva.getPasajero().getId() == idUsuario &&
-                                "CONFIRMADA".equalsIgnoreCase(String.valueOf(reserva.getEstadoReserva()))
-                );
+                .anyMatch(r -> r.getPasajero() != null
+                        && r.getPasajero().getIdUsuario() == idUsuario
+                        && r.getEstadoReserva() == EstadoReserva.CONFIRMADA);
     }
 
     // AUX
