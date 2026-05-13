@@ -342,11 +342,9 @@ public class ViajeService {
 
         // 1. ¿Es el conductor? Buscamos el Conductor por idUsuario y comparamos con Viaje.idConductor.
         Optional<Conductor> conductor = conductorRepository.findByIdUsuario(idUsuario);
-        if (conductor.isPresent()) {
+        if (conductor.isPresent() && viajeRepository.existsByIdAndIdConductor(idViaje, conductor.get().getId())) {
             // Viaje.idConductor es el id de entidad del Conductor, no del Usuario.
-            if (viajeRepository.existsByIdAndIdConductor(idViaje, conductor.get().getId())) {
-                return true;
-            }
+            return true;
         }
 
         // 2. ¿Es un pasajero con reserva CONFIRMADA?
