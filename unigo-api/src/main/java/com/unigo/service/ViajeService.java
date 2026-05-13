@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -203,8 +204,11 @@ public class ViajeService {
         vDB.setOrigen(request.getOrigen());
         vDB.setDestino(request.getDestino());
         vDB.setFechaSalida(request.getFechaSalida());
+        vDB.setHoraSalida(request.getHoraSalida());
         vDB.setPlazasDisponibles(request.getPlazasDisponibles());
         vDB.setPrecioPlaza(request.getPrecioPorPlaza());
+        vDB.setOrigenCoords(request.getOrigenCoords());
+        vDB.setDestinoCoords(request.getDestinoCoords());
         vDB.setIdVehiculo(request.getIdVehiculo());
         // NO SE PUEDE CAMBIAR EL ESTADO DESDE AQUÍ
         viajeRepository.save(vDB);
@@ -325,7 +329,7 @@ public class ViajeService {
     // todo: filtrado origen y destino
     public List<ViajeResponse> getViajesDisponibles(){
         // Solo mostramos viajes DISPONIBLES, futuros y con al menos una plaza libre.
-        return viajeRepository.findAllByEstadoViajeAndFechaSalidaAfter(EstadoViaje.DISPONIBLE, LocalDate.now()).stream()
+        return viajeRepository.findViajesDisponibles(EstadoViaje.DISPONIBLE, LocalDate.now(), LocalTime.now()).stream()
                 .filter(v -> v.getPlazasDisponibles() > 0)
                 .map(ViajeMapper::mapViajeToDto)
                 .toList();
