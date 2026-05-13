@@ -28,4 +28,13 @@ public class AdminUsuarioController {
         return ResponseEntity.ok(usuarioService.cambiarRolUsuario(id, rol));
     }
 
+    @PutMapping("/{id}/ban")
+    public ResponseEntity<?> banearUsuario(@PathVariable int id){
+        return ResponseEntity.ok(usuarioService.banearUsuario(id));
+    }
+
+    @PutMapping("/{id}/unban")
+    public ResponseEntity<?> desbanearUsuario(@PathVariable int id){
+        return ResponseEntity.ok(usuarioService.desbanearUsuario(id));
+    }
 }

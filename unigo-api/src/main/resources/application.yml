@@ -34,6 +34,6 @@ jwt:
   issuer: ${JWT_ISSUER:unigo}
 
 frontend:
-  url: ${FRONTEND_URLS:http://localhost:5173,http://localhost:4173,http://localhost:3000}
+  url: ${FRONTEND_URLS:http://localhost:4200}
 
 precioMaximo: ${PRECIO_MAXIMO:20}
