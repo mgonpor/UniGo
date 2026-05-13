@@ -68,12 +68,40 @@ public class UsuarioService implements UserDetailsService {
 
     public String cambiarRolUsuario(int idUsuario, String rol) {
         Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
-         if(optU.isEmpty()){
-             throw new UsuarioNotFoundException("Usuario no encontrado");
-         }
-         Usuario usuario = optU.get();
-         usuario.setRol(rol);
-         usuarioRepository.save(usuario);
-         return "Nuevo rol: " + usuario.getRol();
+        if(optU.isEmpty()){
+            throw new UsuarioNotFoundException("Usuario no encontrado");
+        }
+        Usuario usuario = optU.get();
+        usuario.setRol(rol);
+        usuarioRepository.save(usuario);
+        return "Nuevo rol: " + usuario.getRol();
+    }
+
+    public String banearUsuario(int idUsuario){
+        Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
+        if(optU.isEmpty()){
+            throw new UsuarioNotFoundException("Usuario no encontrado");
+        }
+        Usuario usuario = optU.get();
+        if(usuario.isBaneado()){
+            throw new UsuarioException("Este usuario ya está baneado");
+        }
+        usuario.setBaneado(true);
+        usuarioRepository.save(usuario);
+        return "Usuario " + usuario.getUsername() + " baneado";
+    }
+
+    public String desbanearUsuario(int idUsuario){
+        Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
+        if(optU.isEmpty()){
+            throw new UsuarioNotFoundException("Usuario no encontrado");
+        }
+        Usuario usuario = optU.get();
+        if(!usuario.isBaneado()){
+            throw new UsuarioException("Este usuario no está baneado");
+        }
+        usuario.setBaneado(false);
+        usuarioRepository.save(usuario);
+        return "Usuario " + usuario.getUsername() + " desbaneado";
     }
 }

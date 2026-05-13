@@ -5,6 +5,7 @@ import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
 import com.unigo.service.dtos.RegisterRequest;
+import com.unigo.service.exceptions.BannedUserException;
 import com.unigo.web.config.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,10 @@ public class LoginService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         Usuario u = this.usuarioService.findByUsername(request.getUsername());
+
+        if(u.isBaneado()){
+            throw new BannedUserException("Este usuario está baneado");
+        }
 
         String accessToken = jwtUtil.generateAccessToken(userDetails, u.getId());
         String refreshToken = jwtUtil.generateRefreshToken(userDetails, u.getId());

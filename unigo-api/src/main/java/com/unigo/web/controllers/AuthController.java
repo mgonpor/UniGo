@@ -1,7 +1,6 @@
 package com.unigo.web.controllers;
 
 import com.unigo.service.dtos.LoginRequest;
-import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
 import com.unigo.service.LoginService;
 import com.unigo.service.dtos.RegisterRequest;
@@ -21,7 +20,7 @@ public class AuthController {
 
     // login
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(this.loginService.login(request));
     }
 

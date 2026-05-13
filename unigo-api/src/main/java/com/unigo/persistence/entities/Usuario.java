@@ -31,6 +31,9 @@ public class Usuario {
 
     private String rol;
 
+    @Column(nullable = false)
+    private boolean baneado = false;
+
     @OneToMany(mappedBy = "remitente")
     @JsonIgnore
     private List<Mensaje> enviados;

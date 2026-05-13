@@ -1,20 +1,7 @@
 package com.unigo.web.config;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.unigo.service.exceptions.ConductorException;
-import com.unigo.service.exceptions.ConductorNotFoundException;
-import com.unigo.service.exceptions.DuplicateResourceException;
-import com.unigo.service.exceptions.GeneralBadRequestException;
-import com.unigo.service.exceptions.GeneralNotFoundException;
-import com.unigo.service.exceptions.PasajeroNotFoundException;
-import com.unigo.service.exceptions.ReservaException;
-import com.unigo.service.exceptions.ReservaNotFoundException;
-import com.unigo.service.exceptions.UsuarioException;
-import com.unigo.service.exceptions.UsuarioNotFoundException;
-import com.unigo.service.exceptions.VehiculoException;
-import com.unigo.service.exceptions.VehiculoNotFoundException;
-import com.unigo.service.exceptions.ViajeException;
-import com.unigo.service.exceptions.ViajeNotFoundException;
+import com.unigo.service.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -58,6 +45,11 @@ public class GlobalExceptionHandler {
     // ─── 403 Forbidden ───────────────────────────────────────────────
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDenied(AccessDeniedException e) {
+        return body(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+
+    @ExceptionHandler(BannedUserException.class)
+    public ResponseEntity<?> handleBannedUser(BannedUserException e){
         return body(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
