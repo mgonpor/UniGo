@@ -139,6 +139,10 @@ public class VehiculoService {
         if (!vehiculoRepository.existsByIdAndIdConductor(idVehiculo, c.get().getId())) {
             throw new VehiculoNotFoundException("No tiene un vehículo con dicho id");
         }
+        String matricula = request.getMatricula().trim().toUpperCase();
+        if (!matricula.matches("^[0-9]{4}[B-DF-HJ-NP-TV-Z]{3}$")) {
+            throw new VehiculoException("La matrícula debe ser válida.");
+        }
         Vehiculo vDB = this.vehiculoRepository.findById(idVehiculo).get();
         vDB.setMarca(request.getMarca());
         vDB.setModelo(request.getModelo());
