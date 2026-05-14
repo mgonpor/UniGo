@@ -77,6 +77,10 @@ public class UsuarioService implements UserDetailsService {
         return "Nuevo rol: " + usuario.getRol();
     }
 
+    public boolean isBaneado(String username){
+        return this.findByUsername(username).isBaneado();
+    }
+
     public String banearUsuario(int idUsuario){
         Optional<Usuario> optU = usuarioRepository.findById(idUsuario);
         if(optU.isEmpty()){
