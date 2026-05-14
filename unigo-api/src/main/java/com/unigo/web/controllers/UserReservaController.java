@@ -43,4 +43,9 @@ public class UserReservaController {
         return ResponseEntity.ok(reservaService.ponerValoraciones(id, valNum, valText));
     }
 
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<?> cambiarEstadoReserva(@PathVariable int id, @RequestParam String estado) {
+        return ResponseEntity.ok(reservaService.cambiarEstadoReserva(id, estado));
+    }
+
 }

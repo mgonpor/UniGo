@@ -5,6 +5,7 @@ import com.unigo.service.dtos.LoginRequest;
 import com.unigo.service.dtos.LoginResponse;
 import com.unigo.service.dtos.RefreshDTO;
 import com.unigo.service.dtos.RegisterRequest;
+import com.unigo.service.exceptions.BannedUserException;
 import com.unigo.web.config.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,17 @@ public class LoginService {
     @Autowired  //Para crear pasajero automáticamente
     private PasajeroService pasajeroService;
 
-    public String registrar(RegisterRequest request) {
+    public LoginResponse registrar(RegisterRequest request) {
         Usuario u = this.usuarioService.create(request);
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateAccessToken(userDetails);
+        String accessToken  = jwtUtil.generateAccessToken(userDetails, u.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails, u.getId());
 
         this.pasajeroService.autoCreate(u.getId());
 
-        return token;
+        return new LoginResponse(accessToken, refreshToken);
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -47,8 +49,14 @@ public class LoginService {
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String accessToken = jwtUtil.generateAccessToken(userDetails);
-        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+        Usuario u = this.usuarioService.findByUsername(request.getUsername());
+
+        if(u.isBaneado()){
+            throw new BannedUserException("Este usuario está baneado");
+        }
+
+        String accessToken = jwtUtil.generateAccessToken(userDetails, u.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails, u.getId());
 
         return new LoginResponse(accessToken, refreshToken);
     }

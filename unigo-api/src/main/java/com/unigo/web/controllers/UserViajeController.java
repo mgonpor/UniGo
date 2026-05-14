@@ -1,5 +1,6 @@
 package com.unigo.web.controllers;
 
+import com.unigo.service.ReservaService;
 import com.unigo.service.ViajeService;
 import com.unigo.service.dtos.ViajeRequest;
 import com.unigo.service.dtos.ViajeResponse;
@@ -15,6 +16,9 @@ public class UserViajeController {
 
     @Autowired
     private ViajeService viajeService;
+
+    @Autowired
+    private ReservaService reservaService;
 
     // CONDUCTOR
     @GetMapping
@@ -57,10 +61,10 @@ public class UserViajeController {
         return ResponseEntity.ok(viajeService.cancelarReserva(idViaje, idReserva));
     }
 
-    // CONDUCTOR
+    // CONDUCTOR (delegado en ReservaService para cohesión de dominio)
     @GetMapping("/{idViaje}/reservas")
-    public ResponseEntity<?> getReservasByIdViaje(@PathVariable int idViaje){
-        return ResponseEntity.ok(viajeService.getReservasByIdViaje(idViaje));
+    public ResponseEntity<?> getReservasPorViaje(@PathVariable int idViaje){
+        return ResponseEntity.ok(reservaService.getReservasByViaje(idViaje));
     }
 
     // PASAJERO
@@ -80,3 +84,4 @@ public class UserViajeController {
     }
 
 }
+

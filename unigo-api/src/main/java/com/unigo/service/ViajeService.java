@@ -5,7 +5,9 @@ import com.unigo.persistence.entities.enums.EstadoReserva;
 import com.unigo.persistence.entities.enums.EstadoViaje;
 import com.unigo.persistence.repositories.ConductorRepository;
 import com.unigo.persistence.repositories.PasajeroRepository;
+import com.unigo.persistence.repositories.ReservaRepository;
 import com.unigo.persistence.repositories.UsuarioRepository;
+import com.unigo.persistence.repositories.VehiculoRepository;
 import com.unigo.persistence.repositories.ViajeRepository;
 import com.unigo.service.dtos.ReservaResponse;
 import com.unigo.service.dtos.ViajeRequest;
@@ -18,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +39,12 @@ public class ViajeService {
 
     @Autowired
     private PasajeroRepository pasajeroRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private VehiculoRepository vehiculoRepository;
 
     @Autowired
     private ReservaService reservaService;
@@ -142,13 +151,9 @@ public class ViajeService {
     }
 
     public ViajeResponse getMiViajeById(int idViaje){
-        Optional<Conductor> c = conductorRepository.findByIdUsuario(getCurrentUsuario().getId());
-        if (c.isEmpty()){
-            throw new ConductorNotFoundException("Aún no eres conductor.");
-        }
-        Optional<Viaje> v = viajeRepository.findByIdAndIdConductor(idViaje, c.get().getId());
+        Optional<Viaje> v = viajeRepository.findById(idViaje);
         if(v.isEmpty()){
-            throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + idViaje);
+            throw new ViajeNotFoundException("No hemos encontrado el viaje con id " + idViaje);
         }
         return ViajeMapper.mapViajeToDto(v.get());
     }
@@ -159,13 +164,17 @@ public class ViajeService {
             throw new ConductorNotFoundException("Aún no eres conductor.");
         }
         if(request.getFechaSalida().isBefore(LocalDate.now())){
-            throw new ViajeException("La fecha de salida debe ser anterior.");
+            throw new ViajeException("La fecha de salida no puede ser anterior a hoy.");
         }
         if (request.getPrecioPorPlaza() > precioMaximo ||  request.getPrecioPorPlaza() < 0){
             throw new ViajeException("Precio no válido");
         }
         if (1 > request.getPlazasDisponibles()){
             throw new ViajeException("Plazas insuficientes");
+        }
+        if (request.getIdVehiculo() != null
+                && !vehiculoRepository.existsByIdAndIdConductor(request.getIdVehiculo(), c.get().getId())) {
+            throw new ViajeException("El vehículo no pertenece a este conductor");
         }
         Viaje newViaje = ViajeMapper.mapDtoToViaje(request);
         newViaje.setId(0);
@@ -187,12 +196,20 @@ public class ViajeService {
         if (!viajeRepository.existsByIdAndIdConductor(id, c.get().getId())){
             throw new ViajeNotFoundException("Viaje " + id + " no relacionado con ese conductor");
         }
+        if (request.getIdVehiculo() != null
+                && !vehiculoRepository.existsByIdAndIdConductor(request.getIdVehiculo(), c.get().getId())) {
+            throw new ViajeException("El vehículo no pertenece a este conductor");
+        }
         Viaje vDB = viajeRepository.findById(id).get();
         vDB.setOrigen(request.getOrigen());
         vDB.setDestino(request.getDestino());
         vDB.setFechaSalida(request.getFechaSalida());
+        vDB.setHoraSalida(request.getHoraSalida());
         vDB.setPlazasDisponibles(request.getPlazasDisponibles());
         vDB.setPrecioPlaza(request.getPrecioPorPlaza());
+        vDB.setOrigenCoords(request.getOrigenCoords());
+        vDB.setDestinoCoords(request.getDestinoCoords());
+        vDB.setIdVehiculo(request.getIdVehiculo());
         // NO SE PUEDE CAMBIAR EL ESTADO DESDE AQUÍ
         viajeRepository.save(vDB);
         return ViajeMapper.mapViajeToDto(vDB);
@@ -240,13 +257,22 @@ public class ViajeService {
             throw new ViajeNotFoundException("No hemos encontrado tu viaje con id " + idViaje);
         }
         Viaje vDB = viajeRepository.findById(idViaje).get();
-        if(! vDB.getReservas().stream().filter(r -> r.getId() == idReserva && r.getEstadoReserva().equals(EstadoReserva.PENDIENTE)).toList().isEmpty()){
-            reservaService.confirmarReservaDesdeViaje(idReserva);
-        }else {
+        if (vDB.getEstadoViaje() != EstadoViaje.DISPONIBLE) {
+            throw new ViajeException("El viaje ya no acepta cambios de reserva (no esta DISPONIBLE)");
+        }
+        boolean reservaConfirmable = vDB.getReservas().stream()
+                .anyMatch(r -> r.getId() == idReserva && r.getEstadoReserva() == EstadoReserva.PENDIENTE);
+        if (!reservaConfirmable) {
             throw new ViajeException("Reserva no existente o ya confirmada");
         }
+        if (vDB.getPlazasDisponibles() < 1) {
+            throw new ViajeException("No hay plazas disponibles para confirmar");
+        }
+        // Decrementamos la plaza UNA sola vez en este punto (la creacion de
+        // la reserva no toca las plazas; solo lo hace la confirmacion).
         vDB.setPlazasDisponibles(vDB.getPlazasDisponibles() - 1);
         viajeRepository.save(vDB);
+        reservaService.confirmarReservaDesdeViaje(idReserva);
         return ViajeMapper.mapViajeToDto(viajeRepository.findById(idViaje).get());
     }
 
@@ -302,27 +328,36 @@ public class ViajeService {
 
     // todo: filtrado origen y destino
     public List<ViajeResponse> getViajesDisponibles(){
-        return viajeRepository.findAllByEstadoViajeAndFechaSalidaAfter(EstadoViaje.DISPONIBLE, LocalDate.now()).stream()
+        // Solo mostramos viajes DISPONIBLES, futuros y con al menos una plaza libre.
+        return viajeRepository.findViajesDisponibles(EstadoViaje.DISPONIBLE, LocalDate.now(), LocalTime.now()).stream()
+                .filter(v -> v.getPlazasDisponibles() > 0)
                 .map(ViajeMapper::mapViajeToDto)
                 .toList();
     }
 
-    // Interceptor mensajeria
+    // Interceptor mensajeria. Recibe el id de Usuario (sub del JWT) y comprueba
+    // si tiene derecho al chat del viaje (conductor o pasajero con reserva
+    // CONFIRMADA). Usa solo queries directas — sin navegar relaciones lazy,
+    // porque este metodo se llama desde el interceptor STOMP fuera de contexto HTTP.
     public boolean puedeAccederAlChat(int idUsuario, int idViaje) {
-        Viaje viaje = viajeRepository.findById(idViaje)
-                .orElseThrow(() -> new ViajeNotFoundException("Viaje no encontrado"));
+        if (!viajeRepository.existsById(idViaje)) {
+            throw new ViajeNotFoundException("Viaje no encontrado");
+        }
 
-        // 1. ¿Es el conductor?
-        if (viaje.getConductor().getId() == idUsuario) {
+        // 1. ¿Es el conductor? Buscamos el Conductor por idUsuario y comparamos con Viaje.idConductor.
+        Optional<Conductor> conductor = conductorRepository.findByIdUsuario(idUsuario);
+        if (conductor.isPresent() && viajeRepository.existsByIdAndIdConductor(idViaje, conductor.get().getId())) {
+            // Viaje.idConductor es el id de entidad del Conductor, no del Usuario.
             return true;
         }
 
-        // 2. ¿Es un pasajero con reserva confirmada?
-        return viaje.getReservas().stream()
-                .anyMatch(reserva ->
-                        reserva.getPasajero().getId() == idUsuario &&
-                                "CONFIRMADA".equalsIgnoreCase(String.valueOf(reserva.getEstadoReserva()))
-                );
+        // 2. ¿Es un pasajero con reserva CONFIRMADA?
+        Optional<Pasajero> pasajero = pasajeroRepository.findByIdUsuario(idUsuario);
+        if (pasajero.isEmpty()) {
+            return false;
+        }
+        return reservaRepository.existsByIdViajeAndIdPasajeroAndEstadoReserva(
+                idViaje, pasajero.get().getId(), EstadoReserva.CONFIRMADA);
     }
 
     // AUX

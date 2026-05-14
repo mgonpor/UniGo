@@ -15,6 +15,10 @@ public class ViajeRequest {
     private String origen;
     private String destino;
     private LocalDate fechaSalida;
+    private java.time.LocalTime horaSalida;
+    private String origenCoords;
+    private String destinoCoords;
     private Integer plazasDisponibles;
     private Double precioPorPlaza;
+    private Integer idVehiculo;
 }
