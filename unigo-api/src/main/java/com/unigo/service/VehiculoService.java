@@ -147,7 +147,7 @@ public class VehiculoService {
         vDB.setMarca(request.getMarca());
         vDB.setModelo(request.getModelo());
         vDB.setColor(request.getColor());
-        vDB.setMatricula(request.getMatricula());
+        vDB.setMatricula(matricula);
         this.vehiculoRepository.save(vDB);
         return VehiculoMapper.mapVehiculoToDto(vDB);
     }
