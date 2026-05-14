@@ -123,6 +123,7 @@ public class VehiculoService {
         }
         v.setId(0);
         v.setIdConductor(idConductor);
+        v.setMatricula(matricula);
 
         return VehiculoMapper.mapVehiculoToDto(vehiculoRepository.save(v));
     }
