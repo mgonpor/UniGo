@@ -3,8 +3,12 @@ package com.unigo.persistence.repositories;
 import com.unigo.persistence.entities.Viaje;
 import com.unigo.persistence.entities.enums.EstadoViaje;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +22,13 @@ public interface ViajeRepository extends JpaRepository<Viaje, Integer> {
 
     List<Viaje> findByEstadoViaje(EstadoViaje estadoViaje);
 
-    List<Viaje> findAllByEstadoViajeAndFechaSalidaAfter(EstadoViaje estadoViaje, LocalDate fechaSalidaAfter);
-
     List<Viaje> findAllByIdIn(List<Integer> ids);
 
     Optional<Viaje> findByIdAndEstadoViajeAndFechaSalidaAfter(int id, EstadoViaje estadoViaje, LocalDate fechaSalidaAfter);
+
+    @Query("SELECT e FROM Viaje e WHERE e.estadoViaje = :estado " +
+            "AND e.fechaSalida > :hoy OR (e.fechaSalida = :hoy AND e.horaSalida > :ahora)" +
+            "AND e.plazasDisponibles > 0")
+    List<Viaje> findViajesDisponibles(@Param("estado") EstadoViaje estadoViaje, @Param("hoy") LocalDate hoy,
+                                      @Param("ahora") LocalTime ahora);
 }

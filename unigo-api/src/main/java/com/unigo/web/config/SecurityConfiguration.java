@@ -44,10 +44,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/**").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/user/**").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/user/**").hasAnyRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/user/**").hasAnyRole("USER")
+                        .requestMatchers("/user/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/admin/**").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/admin/**").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/admin/**").hasAnyRole("ADMIN")
@@ -64,11 +61,21 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Divide la cadena por comas y elimina espacios en blanco
-        /*List<String> allowedOrigins = Arrays.stream(frontendUrls.split(","))
-                .map(String::trim)
-                .toList(); */
-        List<String> allowedOrigins = Arrays.asList("http://localhost:4200");
+        // Lee la lista desde la variable de entorno FRONTEND_URLS (separada por comas).
+        // Si no hay variable, cae a los orígenes de desarrollo habituales de Vite y CRA.
+        List<String> allowedOrigins;
+        if (frontendUrls != null && !frontendUrls.isBlank()) {
+            allowedOrigins = Arrays.stream(frontendUrls.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+        } else {
+            allowedOrigins = Arrays.asList(
+                    "http://localhost:5173",
+                    "http://localhost:4173",
+                    "http://localhost:3000"
+            );
+        }
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));

@@ -34,7 +34,7 @@ public class UserVehiculoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteVehiculo(int id){
+    public ResponseEntity<?> deleteVehiculo(@PathVariable int id){
         return ResponseEntity.ok(vehiculoService.delete(id));
     }
 }

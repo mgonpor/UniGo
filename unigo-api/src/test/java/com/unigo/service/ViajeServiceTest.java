@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -427,7 +428,7 @@ class ViajeServiceTest {
 
     @Test
     void getViajesDisponibles_Ok() {
-        when(viajeRepository.findAllByEstadoViajeAndFechaSalidaAfter(eq(EstadoViaje.DISPONIBLE), any(LocalDate.class)))
+        when(viajeRepository.findViajesDisponibles(eq(EstadoViaje.DISPONIBLE), any(LocalDate.class), any(LocalTime.class)))
                 .thenReturn(List.of(viaje));
 
         List<ViajeResponse> result = viajeService.getViajesDisponibles();

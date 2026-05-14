@@ -13,9 +13,11 @@ public class ReservaResponse {
 
     private Integer id;
     private Integer idPasajero;
+    private PasajeroResponse pasajero;
+    private ViajeResponse viaje;
     private LocalDate fechaReserva;
     private Boolean pagado;
     private String estadoReserva;
-
-    // SIN VALORACIONES
+    private Integer valoracionNumerica;
+    private String valoracionTexto;
 }
