@@ -39,6 +39,15 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // Comprobar baneo antes de autenticar
+                if (usuarioService.isBaneado(username)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\":\"BANNED\"}");
+                    response.getWriter().flush();
+                    return;
+                }
+
                 UserDetails userDetails = usuarioService.loadUserByUsername(username);
                 if (jwtUtils.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
